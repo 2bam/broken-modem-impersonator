@@ -8,7 +8,8 @@ public enum SoundChars
 	Bip = 0,
 	Bop = 1,
 	Rrr = 2,
-	//Gni = 3
+
+	Silence = 1000
 }
 
 public class Word

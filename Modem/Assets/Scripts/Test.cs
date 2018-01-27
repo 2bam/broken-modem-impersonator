@@ -15,7 +15,7 @@ public class Test : MonoBehaviour {
 	string _code;
 	float _charge;
 	bool _detected;
-	int _last = -1;
+	SoundChars _last = SoundChars.Silence;
 
 	Texture2D _texFeedback;
 	public Renderer rendFeedback;
@@ -40,6 +40,13 @@ public class Test : MonoBehaviour {
 	public Text txtVolumeThreshold;
 
 	float _lastPitch;
+
+	public static readonly Dictionary<SoundChars, string> SoundToChar = new Dictionary<SoundChars, string> {
+		{ SoundChars.Bip, "I" }
+		, { SoundChars.Bop, "O" }
+		, { SoundChars.Rrr, "R" }
+		, { SoundChars.Silence, "_" }
+	};
 
 	// Use this for initialization
 	IEnumerator Start () {
@@ -127,18 +134,18 @@ public class Test : MonoBehaviour {
 			if (_iFb == _texFeedback.width) _iFb = 0;
 		}
 
-		int curr = -1;
+		SoundChars curr = SoundChars.Silence;
 
 		if (vflips > flipsThreshold && Mathf.Abs(pitch - _lastPitch) < samePitchSensitivity)
 		{
 			Debug.Log("RRR " + vflips);
-			curr = 2;
+			curr = SoundChars.Rrr;
 		}
 		else if (c.DbValue > volumeThreshold)
 		{
 			//iii 350
 			//oo 550
-			curr = (pitch < 300f ? 0 : 1);
+			curr = pitch < 300f ? SoundChars.Bip : SoundChars.Bop;
 		}
 		_lastPitch = pitch;
 
@@ -152,11 +159,9 @@ public class Test : MonoBehaviour {
 		else
 			_charge += Time.deltaTime;
 
-		if(curr != -1 && _charge > 0.02f && !_detected) {
+		if(curr != SoundChars.Silence && _charge > 0.02f && !_detected) {
 			_detected = true;
-			var names = new string[] { "I", "O", "R" };
-			_code += names[curr];
-
+			_code += SoundToChar[curr];
 			Debug.Log(str);
 			Debug.Log("PITCH INDEX " + c.pitchIndex);
 		}

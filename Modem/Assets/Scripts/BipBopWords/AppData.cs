@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using System.Linq;
 
 public class AppData : Singleton<AppData>
 {
 	[SerializeField] private TextAsset _wordsDefinition;
 	public List<Word> AvailableWords { get; private set; }
+	public List<Word> SelectedWords;
 
 	void Awake()
 	{
@@ -31,5 +33,10 @@ public class AppData : Singleton<AppData>
 		{
 			AvailableWords.Add(new Word(words[i], i));
 		}
+
+		SelectedWords = AvailableWords
+			.OrderBy(x => Random.value)
+			.Take(4)
+			.ToList();
 	}
 }
