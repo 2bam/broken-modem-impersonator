@@ -13,6 +13,7 @@ public enum SoundChars
 
 public class BipBopWord
 {
+	public const int BASE = 4;
 	public const int MAX_DIGITS = 3;
 
 	public string Word { get; private set; }
@@ -25,21 +26,49 @@ public class BipBopWord
 		Id = id;
 
 		if (BipBopValues == null) BipBopValues = new int[MAX_DIGITS];
-		IntToBipBop(Id, 4, MAX_DIGITS, BipBopValues);
+		UpdateBipBopValues(Id, BASE, MAX_DIGITS, BipBopValues);
 	}
 
-	public static void IntToBipBop(int @decimal, int @base, int maxDigits, int[] values)
+	public static int[] IntToBipBop(int @decimal, int @base, int maxDigits)
 	{
+		int[] values = new int[maxDigits];
+
 		if (@decimal > Mathf.Pow(@base, maxDigits))
 		{
 			Debug.LogError("Value would require more digits than allowed.");
-			return;
+			return null;
 		}
 
 		// Clear to zeroes.
 		for (var i = 0; i < values.Length; i++) values[i] = 0;
 
-		if (@decimal <= 0) return;
+		if (@decimal <= 0) return values;
+
+		// Fill from right to left.
+		var currentDigit = maxDigits - 1;
+		while (@decimal > 0)
+		{
+			int digit = @decimal % @base;
+			values[currentDigit] = digit;
+			@decimal = @decimal / @base;
+			currentDigit--;
+		}
+
+		return values;
+	}
+
+	public static bool UpdateBipBopValues(int @decimal, int @base, int maxDigits, int[] values)
+	{
+		if (@decimal > Mathf.Pow(@base, maxDigits))
+		{
+			Debug.LogError("Value would require more digits than allowed.");
+			return false;
+		}
+
+		// Clear to zeroes.
+		for (var i = 0; i < values.Length; i++) values[i] = 0;
+
+		if (@decimal <= 0) return true;
 
 		// Fill from right to left.
 		var currentDigit = maxDigits - 1;
@@ -50,5 +79,7 @@ public class BipBopWord
 			@decimal = @decimal / @base;
 			currentDigit--;
 		}
+
+		return true;
 	}
 }
