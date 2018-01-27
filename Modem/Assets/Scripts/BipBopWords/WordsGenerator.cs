@@ -8,7 +8,7 @@ public class WordsGenerator : MonoBehaviour
 	public int debugIndex;
 
 	[SerializeField] private TextAsset _wordsDefinition;
-	private List<BipBopWord> _availableWords;
+	public List<BipBopWord> AvailableWords { get; private set; }
 
 	void Awake()
 	{
@@ -23,10 +23,10 @@ public class WordsGenerator : MonoBehaviour
 			}
 		}
 
-		_availableWords = new List<BipBopWord>(words.Count);
+		AvailableWords = new List<BipBopWord>(words.Count);
 		for (var i = 0; i < words.Count; i++)
 		{
-			_availableWords.Add(new BipBopWord(words[i], i));
+			AvailableWords.Add(new BipBopWord(words[i], i));
 		}
 	}
 
@@ -34,10 +34,10 @@ public class WordsGenerator : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.B))
 		{
-			if (debugIndex > _availableWords.Count) return;
+			if (debugIndex > AvailableWords.Count) return;
 			print("<color=white>------------------------------------</color>");
-			print("Int: " + debugIndex + " Word: " + _availableWords[debugIndex].Word);
-			foreach(var b in _availableWords[debugIndex].BipBopValues)
+			print("Int: " + debugIndex + " Word: " + AvailableWords[debugIndex].Word);
+			foreach(var b in AvailableWords[debugIndex].BipBopValues)
 			{
 				print(((SoundChars)b).ToString());
 			}
