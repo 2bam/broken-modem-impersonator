@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class WordSelectPanel : MonoBehaviour {
 	public WordSelectButton wordButtonPrefab;
@@ -66,7 +67,7 @@ public class WordSelectPanel : MonoBehaviour {
 
 	public void Done()
 	{
-		//TODO
+		SceneManager.LoadScene(1);
 	}
 
 	public void OnWordClick(Word word)

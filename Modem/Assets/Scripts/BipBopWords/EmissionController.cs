@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum Mode
@@ -13,15 +14,20 @@ public enum Mode
 
 public class EmissionController : MonoBehaviour
 {
-	[SerializeField] InputField _input;
-	[SerializeField] Button _button;
+	[SerializeField] Button _emitButton;
+	[SerializeField] Button _defeatButton;
 
+	[Header("Emission")]
 	[SerializeField] float _seconds;
-	[SerializeField] float _spacingSeconds; 
+	[SerializeField] float _spacingSeconds;
 	[SerializeField] BipBopAudio _audioPlayer;
 
+	[Header("Words Display")]
 	[SerializeField] RectTransform _wordsContainer;
 	[SerializeField] GameObject _wordPrefab;
+
+	[Header("Ending")]
+	[SerializeField] float _waitBeforeEnd;
 
 	List<Word> _currentWords;
 	List<WordView> _views = new List<WordView>(10);
@@ -32,6 +38,9 @@ public class EmissionController : MonoBehaviour
 	int _listeningWordsIndex;
 	Mic _microphone;
 
+	int _matchCount;
+	bool _ended;
+
 	public event Action<int> OnEnterWord;
 	public event Action<int> OnExitWord;
 	public event Action<int, int> OnEnterChar;
@@ -40,12 +49,14 @@ public class EmissionController : MonoBehaviour
 
 	private void OnEnable()
 	{
-		_button.onClick.AddListener(Click);
+		_defeatButton.onClick.AddListener(Defeat);
+		_emitButton.onClick.AddListener(Emit);
 	}
 
 	private void OnDisable()
 	{
-		_button.onClick.RemoveListener(Click);
+		_defeatButton.onClick.RemoveListener(Defeat);
+		_emitButton.onClick.RemoveListener(Emit);
 	}
 
 	private void Start()
@@ -70,9 +81,30 @@ public class EmissionController : MonoBehaviour
 		ClearWords(false);
 	}
 
-	private void Click()
+	private void Emit()
 	{
 		PlayAudio();
+	}
+
+	private void Defeat()
+	{
+		_ended = true;
+		print("<color=red>Someone cut the cable... loser!</color>");
+
+		ResetRecording();
+		StopEmitting();
+		RevealAnswer();
+
+		_emitButton.interactable = false;
+		_defeatButton.interactable = false;
+
+		StartCoroutine(GoToEndLose());
+	}
+
+	private IEnumerator GoToEndLose()
+	{
+		yield return new WaitForSeconds(_waitBeforeEnd);
+		SceneManager.LoadScene("EndLose");
 	}
 
 	void StopEmitting()
@@ -115,13 +147,22 @@ public class EmissionController : MonoBehaviour
 	void PlayAudio()
 	{
 		_microphone.microphoneEnabled = false;
-		_button.interactable = false;
+		_emitButton.interactable = false;
 
 		StopEmitting();
 		_wordEmission = StartCoroutine(EmitWords(_currentWords));
 
 		SetMode(Mode.Playing);
 		ClearWords(true);
+	}
+
+	void RevealAnswer()
+	{
+		_views.ForEach(v =>
+		{
+			v.ShowWordHighlight(false);
+			v.Reveal();
+		});
 	}
 
 	void ClearWords(bool keepIfCorrect)
@@ -143,10 +184,11 @@ public class EmissionController : MonoBehaviour
 
 	public void Feed(Word word)
 	{
+		if (_ended) return;
+
 		// Receive word by word.
 		// Check if it's the same word.
-		if (word == _currentWords[_listeningWordsIndex]) print("Correct");
-		else print("Wrong");
+		if (word == _currentWords[_listeningWordsIndex]) _matchCount++;
 
 		_views[_listeningWordsIndex].OnReceiveWord(word);
 
@@ -156,13 +198,21 @@ public class EmissionController : MonoBehaviour
 		if(_listeningWordsIndex >= _currentWords.Count)
 		{
 			// End.
-			_listeningWordsIndex = 0;
-			_views[_listeningWordsIndex].ShowWordHighlight(false);
-			_button.interactable = true;
+			if (_matchCount == _currentWords.Count) print("<color=green>WHO'S A GOOD MODEM? YOU ARE!.</color>");
+			ResetRecording();
 		}
 		else
 		{
 			_views[_listeningWordsIndex].ShowWordHighlight(true);
 		}
+	}
+
+	private void ResetRecording()
+	{
+		_listeningWordsIndex = 0;
+		_matchCount = 0;
+
+		_views[_listeningWordsIndex].ShowWordHighlight(false);
+		_emitButton.interactable = _matchCount != _currentWords.Count;
 	}
 }
