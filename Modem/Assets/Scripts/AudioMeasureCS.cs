@@ -6,7 +6,7 @@ public class AudioMeasureCS : MonoBehaviour
 	public float DbValue;
 	public float PitchValue;
 
-	private const int QSamples = 1024;
+	private const int QSamples = 1024 * 8;//1024;
 	private const float RefValue = 0.1f;
 	private const float Threshold = 0.02f;
 
@@ -39,7 +39,8 @@ public class AudioMeasureCS : MonoBehaviour
 		DbValue = 20 * Mathf.Log10(RmsValue / RefValue); // calculate dB
 		if (DbValue < -160) DbValue = -160; // clamp it to -160dB min
 											// get sound spectrum
-		GetComponent<AudioSource>().GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
+		//GetComponent<AudioSource>().GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
+		GetComponent<AudioSource>().GetSpectrumData(_spectrum, 0, FFTWindow.Hamming);
 		float maxV = 0;
 		var maxN = 0;
 		for (i = 0; i < QSamples; i++)
