@@ -7,10 +7,7 @@ public class Mic : MonoBehaviour {
 	public bool microphoneEnabled;
 	public EmissionController emissionController;
 
-	T Choice<T>(IList<T> v)
-	{
-		return v[Random.Range(0, v.Count)];
-	}
+
 	// Use this for initialization
 	IEnumerator Start () {
 		while (true)
@@ -19,7 +16,7 @@ public class Mic : MonoBehaviour {
 			yield return new WaitUntil(()=>Input.GetKeyDown("T") && microphoneEnabled);
 			for (int i = 0; i < AppData.Instance.SelectedWords.Count; i++)
 			{
-				//emissionController.Feed(Choice(AppData.Instance.AvailableWords));
+				emissionController.Feed(Utility.Choice(AppData.Instance.AvailableWords));
 				yield return new WaitForSeconds(Random.Range(1f, 4f));
 			}
 		}

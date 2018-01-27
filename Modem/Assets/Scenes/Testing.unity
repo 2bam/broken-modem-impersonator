@@ -687,7 +687,7 @@ MonoBehaviour:
   volumeThreshold: -3
   rendFeedback: {fileID: 2097783898}
   maxQLen: 16
-  flipsThreshold: 7
+  flipsThreshold: 2
   rrrVolumeThreshold: -1
   avgPitchCount: 7
   samePitchSensitivity: 100
