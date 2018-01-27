@@ -254,10 +254,8 @@ MonoBehaviour:
   _seconds: 1
   _spacingSeconds: 0
   _audioPlayer: {fileID: 867377005}
-  PlayTestWords: 1
-  testWords: 010000000200000005000000
   _wordsContainer: {fileID: 1472748201}
-  _wordPrefab: {fileID: 1996577050726170, guid: c9ec20f6e340a9d489deba5abce3e040,
+  _wordPrefab: {fileID: 1622914085166114, guid: ed872631633badf4995d46a16f7afd46,
     type: 2}
 --- !u!4 &753165909
 Transform:
@@ -538,6 +536,48 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 941382518}
+--- !u!1 &967827714
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 967827716}
+  - component: {fileID: 967827715}
+  m_Layer: 0
+  m_Name: DUMMY MIC
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &967827715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 967827714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10e1780ebbeeeed45913e60784fca979, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  microphoneEnabled: 0
+  emissionController: {fileID: 753165908}
+--- !u!4 &967827716
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 967827714}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 477.55933, y: 365.54474, z: 9.26159}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1399035626
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,7 +743,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 400, y: 120}
-  m_Spacing: {x: 50, y: 0}
+  m_Spacing: {x: 50, y: 70}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!1 &1515632043
@@ -876,7 +916,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b64e7980bab06f44a822318621081af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugIndex: 0
   _wordsDefinition: {fileID: 4900000, guid: 1624562e9ae7d8a4b83bd406fe221e72, type: 3}
 --- !u!4 &1565712286
 Transform:
@@ -939,7 +978,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ReferenceResolution: {x: 1080, y: 1920}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

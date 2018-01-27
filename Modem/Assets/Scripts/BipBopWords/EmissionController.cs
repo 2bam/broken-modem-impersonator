@@ -1,8 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+
+public enum Mode
+{
+	Playing,
+	Recording
+}
 
 public class EmissionController : MonoBehaviour
 {
@@ -13,14 +20,17 @@ public class EmissionController : MonoBehaviour
 	[SerializeField] float _spacingSeconds; 
 	[SerializeField] BipBopAudio _audioPlayer;
 
-	[Header("Debug")]
 	[SerializeField] RectTransform _wordsContainer;
 	[SerializeField] GameObject _wordPrefab;
 
 	List<Word> _currentWords;
+	List<WordView> _views = new List<WordView>(10);
 
 	SoundChars[] _bipBopValues = new SoundChars[Word.MAX_DIGITS];
 	Coroutine _wordEmission;
+
+	int _listeningWordsIndex;
+	Mic _microphone;
 
 	public event Action<int> OnEnterWord;
 	public event Action<int> OnExitWord;
@@ -40,34 +50,29 @@ public class EmissionController : MonoBehaviour
 
 	private void Start()
 	{
+		if (_microphone == null) _microphone = FindObjectOfType<Mic>();
+
 		// Read this from AvailableWords.
-		_currentWords = new List<Word>()
-		{
-			AppData.Instance.AvailableWords[0],
-			AppData.Instance.AvailableWords[2],
-			AppData.Instance.AvailableWords[4]
-		};
+		_currentWords = AppData.Instance.SelectedWords;
 
 		GenerateWordViews(_currentWords);
-	}
-
-	public void Feed(Word word)
-	{
-
 	}
 
 	private void GenerateWordViews(List<Word> words)
 	{
 		foreach(var word in words)
 		{
-			var wordView = Instantiate(_wordPrefab, _wordsContainer, false);
+			var wordView = Instantiate(_wordPrefab, _wordsContainer, false).GetComponent<WordView>();
+			wordView.Set(word);
+			_views.Add(wordView);
 		}
+
+		ClearWords(false);
 	}
 
 	private void Click()
 	{
-		StopEmitting();
-		_wordEmission = StartCoroutine(EmitWords(_currentWords));
+		PlayAudio();
 	}
 
 	void StopEmitting()
@@ -81,11 +86,9 @@ public class EmissionController : MonoBehaviour
 		for (var i = 0; i < words.Count; i++)
 		{
 			var wordValue = words[i].Id;
-			if (OnEnterWord != null)
-			{
-				print("Entered word: " + i);
-				OnEnterWord(i);
-			}
+
+			print("Entered word: " + i);
+			_views[i].OnEnterWord();
 
 			if (!Word.UpdateBipBopValues(wordValue, Word.BASE, Word.MAX_DIGITS, _bipBopValues))
 			{
@@ -97,45 +100,69 @@ public class EmissionController : MonoBehaviour
 			for (var j = 0; j < _bipBopValues.Length; j++)
 			{
 				var sound = (int)_bipBopValues[j];
-
-				if (OnEnterChar != null)
-				{
-					print("Entered char: " + j);
-					OnEnterChar(wordValue, j);
-				}
-
 				_audioPlayer.Play(sound);
 
 				yield return new WaitForSeconds(_seconds);
 			}
 
-			if (OnExitWord != null)
-			{
-				print("Exit word: " + i);
-				OnExitWord(i);
-			}
+			print("Exit word: " + i);
+			_views[i].OnExitWord();
 		}
+
+		Record();
 	}
 
-	//IEnumerator EmitWord()
-	//{
-	//	var index = int.Parse(_input.text);
+	void PlayAudio()
+	{
+		_microphone.microphoneEnabled = false;
+		_button.interactable = false;
 
-	//	if (!Word.UpdateBipBopValues(index, Word.BASE, Word.MAX_DIGITS, _bipBopValues))
-	//	{
-	//		Debug.LogFormat("Can't play: {0} is over the max supported value.", index);
-	//		_wordEmission = null;
-	//		yield break;
-	//	}
+		StopEmitting();
+		_wordEmission = StartCoroutine(EmitWords(_currentWords));
 
-	//	Debug.LogFormat("Playing: {0}", index);
-	//	for (var i = 0; i < _bipBopValues.Length; i++)
-	//	{
-	//		var sound = (int) _bipBopValues[i];
-	//		_audioPlayer.Play(sound);
-	//		yield return new WaitForSeconds(_seconds);
-	//	}
+		SetMode(Mode.Playing);
+		ClearWords(true);
+	}
 
-	//	_wordEmission = null;
-	//}
+	void ClearWords(bool keepIfCorrect)
+	{
+		_views.ForEach(v => v.Clear(keepIfCorrect));
+	}
+
+	void SetMode(Mode mode)
+	{
+		_views.ForEach(v => v.SetMode(mode));
+	}
+
+	void Record()
+	{
+		_microphone.microphoneEnabled = true;
+		SetMode(Mode.Recording);
+		_views[0].ShowWordHighlight(true);
+	}
+
+	public void Feed(Word word)
+	{
+		// Receive word by word.
+		// Check if it's the same word.
+		if (word == _currentWords[_listeningWordsIndex]) print("Correct");
+		else print("Wrong");
+
+		_views[_listeningWordsIndex].OnReceiveWord(word);
+
+		_views[_listeningWordsIndex].ShowWordHighlight(false);
+		_listeningWordsIndex++;
+
+		if(_listeningWordsIndex >= _currentWords.Count)
+		{
+			// End.
+			_listeningWordsIndex = 0;
+			_views[_listeningWordsIndex].ShowWordHighlight(false);
+			_button.interactable = true;
+		}
+		else
+		{
+			_views[_listeningWordsIndex].ShowWordHighlight(true);
+		}
+	}
 }
