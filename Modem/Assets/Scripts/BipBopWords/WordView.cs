@@ -29,12 +29,12 @@ public class WordView : MonoBehaviour
 	public void Set(Word word)
 	{
 		_word = word;
-		_text.text = word.Value;
+		_text.text = word.Text;
 	}
 
 	public void Clear(bool keepIfCorrect)
 	{
-		_text.text = !keepIfCorrect || _guessedWord != _word ? "XXXXXXX" : _word.Value;
+		_text.text = !keepIfCorrect || _guessedWord != _word ? "XXXXXXX" : _word.Text;
 	}
 
 	public void OnEnterWord(int index)
@@ -99,7 +99,7 @@ public class WordView : MonoBehaviour
 	{
 		_guessedWord = word;
 		_text.color = (word == _word) ? Color.green : Color.red;
-		_text.text = word.Value;
+		_text.text = word.Text;
 	}
 
 	public void SetMode(Mode mode)

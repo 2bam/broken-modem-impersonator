@@ -21,7 +21,7 @@ public class WordSelectPanel : MonoBehaviour {
 			copy.Setup(this, word);
 			var b = copy.GetComponent<Button>();
 			var t = b.GetComponentInChildren<Text>();
-			t.text = word.Value;//Enumerable.Repeat("A", Random.Range(5, 10)).Aggregate("", (a, x) => a + x);
+			t.text = word.Text;//Enumerable.Repeat("A", Random.Range(5, 10)).Aggregate("", (a, x) => a + x);
 			buttons.Add(b);
 		}
 
@@ -55,7 +55,7 @@ public class WordSelectPanel : MonoBehaviour {
 	{
 		Debug.Assert(AppData.Instance.SelectedWords != null);
 		txtPhrase.text = AppData.Instance.SelectedWords
-			.Aggregate("", (a, x) => a + x.Value + " ");
+			.Aggregate("", (a, x) => a + x.Text + " ");
 	}
 
 	public void Clear()

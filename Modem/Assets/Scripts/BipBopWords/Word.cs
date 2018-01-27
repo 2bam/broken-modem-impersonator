@@ -17,14 +17,14 @@ public class Word
 	public const int BASE = 3;
 	public const int MAX_DIGITS = 4;
 
-	public string Value { get; private set; }
+	public string Text { get; private set; }
 	public string Category { get; private set; }
 	public int Id { get; private set; }
 	public SoundChars[] BipBopValues { get; private set; }
 
 	public Word(string wordText, int id, string category)
 	{
-		Value = wordText;
+		Text = wordText;
 		Category = category;
 		Id = id;
 

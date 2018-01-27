@@ -6,7 +6,6 @@ using System.Linq;
 
 public class AppData : Singleton<AppData>
 {
-	//[SerializeField] private TextAsset _wordsDefinition;
 	public List<Word> AvailableWords { get; private set; }
 	public List<Word> SelectedWords;
 
