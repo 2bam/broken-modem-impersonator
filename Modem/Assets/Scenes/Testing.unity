@@ -249,7 +249,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 114.09, y: -224}
+  m_AnchoredPosition: {x: -216, y: -799}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &732509123
@@ -384,7 +384,7 @@ GameObject:
   - component: {fileID: 824853827}
   - component: {fileID: 824853826}
   m_Layer: 5
-  m_Name: Text
+  m_Name: TxtThresholdValue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -405,7 +405,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 660.91, y: -236.4986}
+  m_AnchoredPosition: {x: 331, y: -801.78345}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &824853826
@@ -429,7 +429,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 23
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
@@ -572,8 +572,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 29, y: 88}
-  m_SizeDelta: {x: 888.2, y: 324.7}
+  m_AnchoredPosition: {x: -10.5, y: -310}
+  m_SizeDelta: {x: 989.1, y: 464.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1239900351
 MonoBehaviour:
@@ -591,7 +591,26 @@ MonoBehaviour:
   PitchValue: 0
   pitchIndex: 0
   QSamples: 2048
+  spectrumLerpFactor: 2.28
   pow2samples: 9
+  spectrumMap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!82 &1239900352
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1056,7 +1075,7 @@ GameObject:
   - component: {fileID: 2097783899}
   - component: {fileID: 2097783898}
   m_Layer: 5
-  m_Name: Quad
+  m_Name: FeedbackQuad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1124,8 +1143,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2097783897}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -23, y: 1.53, z: 0}
-  m_LocalScale: {x: 40.83105, y: 40.83107, z: 40.83107}
+  m_LocalPosition: {x: 0.6, y: 14.4, z: 0}
+  m_LocalScale: {x: 27.709764, y: 27.709778, z: 27.709778}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
