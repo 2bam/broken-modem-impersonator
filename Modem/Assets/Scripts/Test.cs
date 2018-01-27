@@ -11,6 +11,11 @@ public class Test : MonoBehaviour {
 	float _charge;
 	bool _detected;
 	int _last = -1;
+
+	Texture2D _texFeedback;
+	public Renderer rendFeedback;
+	int _iFb;
+
 	// Use this for initialization
 	IEnumerator Start () {
 		var aud = GetComponent<AudioSource>();
@@ -23,6 +28,19 @@ public class Test : MonoBehaviour {
 		}
 		Debug.Log("Mic on");
 		aud.Play();
+
+		_texFeedback = new Texture2D(128, 512);
+		rendFeedback.material.mainTexture = _texFeedback;
+
+		/*for (int y = 0; y < _texFeedback.height; y++)
+		{
+			for (int x = 0; x < _texFeedback.width; x++)
+			{
+				Color color = ((x & y) != 0 ? Color.white : Color.gray);
+				_texFeedback.SetPixel(x, y, color);
+			}
+		}
+		_texFeedback.Apply();*/
 	}
 
 
@@ -33,12 +51,24 @@ public class Test : MonoBehaviour {
 			+ _code;
 		GetComponent<Text>().text = str;
 
+		if (_texFeedback != null)
+		{
+			for (int y = 0; y < _texFeedback.height; y++)
+				_texFeedback.SetPixel(_iFb, y, Color.white);
+			_texFeedback.SetPixel(_iFb, Mathf.Clamp((int)(c.PitchValue * 0.4f), 0, _texFeedback.height - 1), Color.red);
+			_texFeedback.Apply();
+			_iFb++;
+			if (_iFb == _texFeedback.width) _iFb = 0;
+		}
+
 		int curr = -1;
 		if (c.DbValue > volumeThreshold)
 		{
 			//iii 350
 			//oo 550
-			curr = (c.PitchValue < 430f ? 0 : 1);
+			curr = (c.PitchValue < 420f ? 0 : 1);
+
+
 		}
 
 		if (curr != _last)
@@ -51,7 +81,7 @@ public class Test : MonoBehaviour {
 		else
 			_charge += Time.deltaTime;
 
-		if(curr != -1 && _charge > 0.05f && !_detected) {
+		if(curr != -1 && _charge > 0.02f && !_detected) {
 			_detected = true;
 			_code += (curr == 0 ? "I " : "O");
 
