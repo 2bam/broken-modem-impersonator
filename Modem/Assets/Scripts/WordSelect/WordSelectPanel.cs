@@ -89,7 +89,7 @@ public class WordSelectPanel : MonoBehaviour {
 	public void Done()
 	{
 		//TODO: Grey out button, for now just don't work.
-		if(!AppData.Instance.SelectedWords.Any())
+		if(AppData.Instance.SelectedWords.Any())
 			SceneManager.LoadScene(1);
 	}
 
