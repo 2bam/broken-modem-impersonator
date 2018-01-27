@@ -4,4 +4,13 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/WordSelection.unity
+    guid: 55e5dc619328be141b3cacad39efc130
+  - enabled: 1
+    path: Assets/Scenes/TestWords.unity
+    guid: d26fbe2723486f54f99475b738756ef5
+  - enabled: 1
+    path: Assets/Scenes/EndLose.unity
+    guid: e37bc911340d5fe47a1a8b68121f1a9e

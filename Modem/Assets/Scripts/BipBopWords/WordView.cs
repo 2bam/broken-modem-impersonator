@@ -107,4 +107,9 @@ public class WordView : MonoBehaviour
 		_text.color = Color.grey;
 		_highlightWord.GetComponent<Image>().color = mode == Mode.Recording ? _recordingColor : _listeningColor;
 	}
+
+	public void Reveal()
+	{
+		_text.text = _word.Text;
+	}
 }
