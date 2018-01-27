@@ -19,7 +19,7 @@ public class EmissionController : MonoBehaviour
 	[SerializeField] RectTransform _wordsContainer;
 	[SerializeField] GameObject _wordPrefab;
 
-	int[] _bipBopValues = new int[BipBopWord.MAX_DIGITS];
+	SoundChars[] _bipBopValues = new SoundChars[Word.MAX_DIGITS];
 	Coroutine _wordEmission;
 
 	public event Action<int> OnEnterWord;
@@ -40,12 +40,12 @@ public class EmissionController : MonoBehaviour
 
 	private void Awake()
 	{
-		GenerateWordViews();
+		GenerateWordViews(testWords);
 	}
 
-	private void GenerateWordViews()
+	private void GenerateWordViews(List<int> words)
 	{
-		foreach(var word in testWords)
+		foreach(var word in words)
 		{
 			var wordView = Instantiate(_wordPrefab, _wordsContainer, false);
 		}
@@ -74,7 +74,7 @@ public class EmissionController : MonoBehaviour
 				OnEnterWord(i);
 			}
 
-			if (!BipBopWord.UpdateBipBopValues(wordValue, BipBopWord.BASE, BipBopWord.MAX_DIGITS, _bipBopValues))
+			if (!Word.UpdateBipBopValues(wordValue, Word.BASE, Word.MAX_DIGITS, _bipBopValues))
 			{
 				Debug.LogFormat("Can't play: {0} is over the max supported value.", wordValue);
 				_wordEmission = null;
@@ -83,8 +83,7 @@ public class EmissionController : MonoBehaviour
 
 			for (var j = 0; j < _bipBopValues.Length; j++)
 			{
-				var charValue = _bipBopValues[j];
-				var sound = _bipBopValues[charValue];
+				var sound = (int)_bipBopValues[j];
 
 				if (OnEnterChar != null)
 				{
@@ -109,7 +108,7 @@ public class EmissionController : MonoBehaviour
 	{
 		var index = int.Parse(_input.text);
 
-		if (!BipBopWord.UpdateBipBopValues(index, BipBopWord.BASE, BipBopWord.MAX_DIGITS, _bipBopValues))
+		if (!Word.UpdateBipBopValues(index, Word.BASE, Word.MAX_DIGITS, _bipBopValues))
 		{
 			Debug.LogFormat("Can't play: {0} is over the max supported value.", index);
 			_wordEmission = null;
@@ -119,7 +118,7 @@ public class EmissionController : MonoBehaviour
 		Debug.LogFormat("Playing: {0}", index);
 		for (var i = 0; i < _bipBopValues.Length; i++)
 		{
-			var sound = _bipBopValues[i];
+			var sound = (int) _bipBopValues[i];
 			_audioPlayer.Play(sound);
 			yield return new WaitForSeconds(_seconds);
 		}

@@ -7,25 +7,25 @@ public enum SoundChars
 {
 	Bip = 0,
 	Bop = 1,
-	Grr = 2,
-	Gni = 3
+	Rrr = 2,
+	//Gni = 3
 }
 
-public class BipBopWord
+public class Word
 {
-	public const int BASE = 4;
-	public const int MAX_DIGITS = 3;
+	public const int BASE = 3;
+	public const int MAX_DIGITS = 4;
 
-	public string Word { get; private set; }
+	public string Value { get; private set; }
 	public int Id { get; private set; }
-	public int[] BipBopValues { get; private set; }
+	public SoundChars[] BipBopValues { get; private set; }
 
-	public BipBopWord(string word, int id)
+	public Word(string word, int id)
 	{
-		Word = word;
+		Value = word;
 		Id = id;
 
-		if (BipBopValues == null) BipBopValues = new int[MAX_DIGITS];
+		if (BipBopValues == null) BipBopValues = new SoundChars[MAX_DIGITS];
 		UpdateBipBopValues(Id, BASE, MAX_DIGITS, BipBopValues);
 	}
 
@@ -57,7 +57,7 @@ public class BipBopWord
 		return values;
 	}
 
-	public static bool UpdateBipBopValues(int @decimal, int @base, int maxDigits, int[] values)
+	public static bool UpdateBipBopValues(int @decimal, int @base, int maxDigits, SoundChars[] values)
 	{
 		if (@decimal > Mathf.Pow(@base, maxDigits))
 		{
@@ -75,7 +75,7 @@ public class BipBopWord
 		while (@decimal > 0)
 		{
 			int digit = @decimal % @base;
-			values[currentDigit]= digit;
+			values[currentDigit]= (SoundChars) digit;
 			@decimal = @decimal / @base;
 			currentDigit--;
 		}

@@ -1,6 +1,18 @@
-Ornitorrinco
-Palindromo
-Suricata
-Mondongo
-Churrasco
-Quisquilloso
+-- Adjectives
+Flatulent
+Pink
+Red
+Magenta
+-- Substantives
+Platypus
+Building
+-- Verbs
+Eat
+Sleep
+Pray
+Kiss
+Die
+-- Conectors
+And
+From
+To
