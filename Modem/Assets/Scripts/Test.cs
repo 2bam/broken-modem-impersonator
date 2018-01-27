@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 //https://answers.unity.com/questions/1113690/microphone-input-in-unity-5x.html
+
+
+//TODO: Read https://electronics.stackexchange.com/questions/239730/performing-fft-at-low-frequencies-but-high-resolution
 
 public class Test : MonoBehaviour {
 	public float volumeThreshold = 0.18f;
@@ -15,6 +20,13 @@ public class Test : MonoBehaviour {
 	Texture2D _texFeedback;
 	public Renderer rendFeedback;
 	int _iFb;
+
+	Queue<float> _volumeQ = new Queue<float>();
+	public int maxQLen = 16;
+	public int flipsThreshold = 3;
+	public float rrrVolumeThreshold = 0f;
+
+	public Text txtVolumeThreshold;
 
 	// Use this for initialization
 	IEnumerator Start () {
@@ -43,13 +55,37 @@ public class Test : MonoBehaviour {
 		_texFeedback.Apply();*/
 	}
 
+	public void SetVolumeThreshold(Slider slider)
+	{
+		volumeThreshold = slider.value;
+		txtVolumeThreshold.text = volumeThreshold.ToString("0.00");
+	}
 
 	// Update is called once per frame
 	void Update () {
+		
+
 		var c = GetComponent<AudioMeasureCS>();
 		var str = string.Format("P{0:0.00} V{1:0.00}", c.PitchValue, c.DbValue) + "\n"
 			+ _code;
 		GetComponent<Text>().text = str;
+
+		_volumeQ.Enqueue(c.DbValue);
+		if (_volumeQ.Count > maxQLen)
+			_volumeQ.Dequeue();
+		//Debug.Log(_volumeQ.Aggregate("", (a, x) => a + string.Format("  {0:0.0}", x)));
+		var flips = _volumeQ.Aggregate(
+			new { flips = 0, last = _volumeQ.Peek() > rrrVolumeThreshold }
+			, (a, x) =>
+				{
+					var val = x > rrrVolumeThreshold;
+					return new { flips = a.flips + (val != a.last ? 1 : 0), last = val };
+				}
+			)
+			.flips;
+
+		if (flips > flipsThreshold)
+			Debug.Log("RRR " + flips);
 
 		if (_texFeedback != null)
 		{

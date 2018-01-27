@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 public class AudioMeasureCS : MonoBehaviour
 {
@@ -6,19 +8,29 @@ public class AudioMeasureCS : MonoBehaviour
 	public float DbValue;
 	public float PitchValue;
 
-	private const int QSamples = 512;//1024 * 8;//1024;
+	public int QSamples = 2048;//512;
 	private const float RefValue = 0.1f;
 	private const float Threshold = 0.02f;
 
+
+	//RR = 0.032 - 0.040s
 	float[] _samples;
 	private float[] _spectrum;
 	private float _fSample;
 
+	[Range(8, 15)]
+	public int pow2samples = 12;
+
+	AudioSource _asrc;
+
 	void Start()
 	{
+		QSamples = (int)Mathf.Pow(2f, pow2samples);
 		_samples = new float[QSamples];
 		_spectrum = new float[QSamples];
 		_fSample = AudioSettings.outputSampleRate;
+		Debug.Log("Output sample rate " + _fSample);
+		_asrc = GetComponent<AudioSource>();
 	}
 
 	void Update()
@@ -28,7 +40,8 @@ public class AudioMeasureCS : MonoBehaviour
 
 	void AnalyzeSound()
 	{
-		GetComponent<AudioSource>().GetOutputData(_samples, 0); // fill array with samples
+		_asrc.GetOutputData(_samples, 0); // fill array with samples
+
 
 		float sum = 0;
 		for (var i = 0; i < QSamples; i++)
@@ -39,8 +52,9 @@ public class AudioMeasureCS : MonoBehaviour
 		DbValue = 20 * Mathf.Log10(RmsValue / RefValue); // calculate dB
 		if (DbValue < -160) DbValue = -160; // clamp it to -160dB min
 											// get sound spectrum
-		//GetComponent<AudioSource>().GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
-		GetComponent<AudioSource>().GetSpectrumData(_spectrum, 0, FFTWindow.Hamming);
+											//GetComponent<AudioSource>().GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
+
+		_asrc.GetSpectrumData(_spectrum, 0, FFTWindow.Hamming);
 		float maxV = 0;
 		var maxN = 0;
 		for (var i = 0; i < QSamples; i++)
@@ -52,12 +66,12 @@ public class AudioMeasureCS : MonoBehaviour
 			maxN = i; // maxN is the index of max
 		}
 		float freqN = maxN; // pass the index to a float variable
-		if (maxN > 0 && maxN < QSamples - 1)
+		/*if (maxN > 0 && maxN < QSamples - 1)
 		{ // interpolate index using neighbours
 			var dL = _spectrum[maxN - 1] / _spectrum[maxN];
 			var dR = _spectrum[maxN + 1] / _spectrum[maxN];
 			freqN += 0.5f * (dR * dR - dL * dL);
-		}
+		}*/
 		PitchValue = freqN * (_fSample / 2) / QSamples; // convert index to frequency
 
 		var spectrum = _spectrum;

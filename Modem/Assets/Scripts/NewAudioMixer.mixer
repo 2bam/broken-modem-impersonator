@@ -15,7 +15,11 @@ AudioMixerController:
   m_EnableSuspend: 1
   m_UpdateMode: 0
   m_ExposedParameters: []
-  m_AudioMixerGroupViews: []
+  m_AudioMixerGroupViews:
+  - guids:
+    - 969f58c3107ba024799d208ef9ecb929
+    - 912ca4610657ca441a9ba7913f5b289d
+    name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
 --- !u!243 &24300002
@@ -26,7 +30,8 @@ AudioMixerGroupController:
   m_Name: Master
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 969f58c3107ba024799d208ef9ecb929
-  m_Children: []
+  m_Children:
+  - {fileID: 243151577930414090}
   m_Volume: 1daa65baa871a6c4487f41bb66543e6b
   m_Pitch: 7d296bd2ea9a1c542b07b272e48b3144
   m_Effects:
@@ -56,5 +61,36 @@ AudioMixerSnapshotController:
   m_Name: Snapshot
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: 80e8642b12b28744fbfb92e73a27dab2
-  m_FloatValues: {}
+  m_FloatValues:
+    c9b25077e1a21a24e98c3a0d4104c667: -70.6
   m_TransitionOverrides: {}
+--- !u!243 &243151577930414090
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: MicAMGrp
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 912ca4610657ca441a9ba7913f5b289d
+  m_Children: []
+  m_Volume: c9b25077e1a21a24e98c3a0d4104c667
+  m_Pitch: e2db755e7a4772947a0d1bedbb8b6e44
+  m_Effects:
+  - {fileID: 244622171539525346}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!244 &244622171539525346
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_EffectID: f0bc003e36fd3fe489665ee517ba78c7
+  m_EffectName: Attenuation
+  m_MixLevel: 24dc17d10b3a62845882abb541e5ccb7
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
