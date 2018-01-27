@@ -39,6 +39,18 @@ public class AudioMeasureCS : MonoBehaviour
 		AnalyzeSound();
 	}
 
+	void DrawData(float[] spectrum)
+	{
+		var offset = Vector3.zero;// var offset = Vector3.up * 5f;
+		for (var i = 1; i < spectrum.Length - 1; i++)
+		{
+			//Debug.DrawLine(offset + new Vector3(i - 1, spectrum[i] + 10, 0), offset + new Vector3(i, spectrum[i + 1] + 10, 0), Color.red);
+			//Debug.DrawLine(offset + new Vector3(i - 1, Mathf.Log(spectrum[i - 1]) + 10, 2), offset + new Vector3(i, Mathf.Log(spectrum[i]) + 10, 2), Color.cyan);
+			Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), spectrum[i - 1] - 10, 1), offset + new Vector3(Mathf.Log(i), spectrum[i] - 10, 1), Color.green);
+			//Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), Mathf.Log(spectrum[i - 1]), 3), offset + new Vector3(Mathf.Log(i), Mathf.Log(spectrum[i]), 3), Color.blue);
+		}
+	}
+
 	void AnalyzeSound()
 	{
 		_asrc.GetOutputData(_samples, 0); // fill array with samples
@@ -53,36 +65,35 @@ public class AudioMeasureCS : MonoBehaviour
 		DbValue = 20 * Mathf.Log10(RmsValue / RefValue); // calculate dB
 		if (DbValue < -160) DbValue = -160; // clamp it to -160dB min
 											// get sound spectrum
-											//GetComponent<AudioSource>().GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
+	
+		_asrc.GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
+		// _asrc.GetSpectrumData(_spectrum, 0, FFTWindow.Hamming);
 
-		_asrc.GetSpectrumData(_spectrum, 0, FFTWindow.Hamming);
+
+		DrawData(_spectrum);
+
+
 		float maxV = 0;
 		var maxN = 0;
 		for (var i = 0; i < QSamples; i++)
 		{ // find max 
-			if (!(_spectrum[i] > maxV) || !(_spectrum[i] > Threshold))
+			if (_spectrum[i] <= maxV || _spectrum[i] <= Threshold)
 				continue;
 
 			maxV = _spectrum[i];
 			maxN = i; // maxN is the index of max
 		}
 		float freqN = maxN; // pass the index to a float variable
-		/*if (maxN > 0 && maxN < QSamples - 1)
+		if (maxN > 0 && maxN < QSamples - 1)
 		{ // interpolate index using neighbours
 			var dL = _spectrum[maxN - 1] / _spectrum[maxN];
 			var dR = _spectrum[maxN + 1] / _spectrum[maxN];
 			freqN += 0.5f * (dR * dR - dL * dL);
-		}*/
+		}
 		PitchValue = freqN * (_fSample / 2) / QSamples; // convert index to frequency
+		//PitchValue = (Mathf.Exp(freqN / QSamples)-1) * _fSample; // convert index to frequency
 		pitchIndex = maxN;
 
-		var offset = Vector3.zero;// var offset = Vector3.up * 5f;
-		for (var i = 1; i < _spectrum.Length - 1; i++)
-		{
-			Debug.DrawLine(offset + new Vector3(i - 1, _spectrum[i] + 10, 0), offset + new Vector3(i, _spectrum[i + 1] + 10, 0), Color.red);
-			Debug.DrawLine(offset + new Vector3(i - 1, Mathf.Log(_spectrum[i - 1]) + 10, 2), offset + new Vector3(i, Mathf.Log(_spectrum[i]) + 10, 2), Color.cyan);
-			Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), _spectrum[i - 1] - 10, 1), offset + new Vector3(Mathf.Log(i), _spectrum[i] - 10, 1), Color.green);
-			Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), Mathf.Log(_spectrum[i - 1]), 3), offset + new Vector3(Mathf.Log(i), Mathf.Log(_spectrum[i]), 3), Color.blue);
-		}
+
 	}
 }

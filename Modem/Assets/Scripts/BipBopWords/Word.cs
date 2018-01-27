@@ -18,12 +18,14 @@ public class Word
 	public const int MAX_DIGITS = 4;
 
 	public string Value { get; private set; }
+	public string Category { get; private set; }
 	public int Id { get; private set; }
 	public SoundChars[] BipBopValues { get; private set; }
 
-	public Word(string word, int id)
+	public Word(string wordText, int id, string category)
 	{
-		Value = word;
+		Value = wordText;
+		Category = category;
 		Id = id;
 
 		if (BipBopValues == null) BipBopValues = new SoundChars[MAX_DIGITS];

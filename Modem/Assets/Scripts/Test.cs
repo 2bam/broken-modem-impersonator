@@ -92,6 +92,8 @@ public class Test : MonoBehaviour {
 		txtVolumeThreshold.text = volumeThreshold.ToString("0.00");
 	}
 
+
+
 	// Update is called once per frame
 	void Update () {
 
@@ -118,10 +120,13 @@ public class Test : MonoBehaviour {
 			)
 			.flips;
 
-		var pitch = _queue
-			.Select(x => x.pitch)
-			.Take(avgPitchCount)
-			.Average();
+		/*
+	var pitch = _queue
+		.Select(x => x.pitch)
+		.Take(avgPitchCount)
+		//.Average();
+		.Median();*/
+		var pitch = c.PitchValue;
 
 
 		if (_texFeedback != null)
@@ -145,25 +150,38 @@ public class Test : MonoBehaviour {
 		{
 			//iii 350
 			//oo 550
-			curr = pitch < 300f ? SoundChars.Bip : SoundChars.Bop;
+			curr = pitch < 400f ? SoundChars.Bip : SoundChars.Bop;
 		}
 		_lastPitch = pitch;
 
-		if (curr != _last)
+		_charge += Time.deltaTime;
+
+		if (curr == SoundChars.Silence)
 		{
-			_last = curr;
-			_charge = 0f;
-			_detected = false;
-			Debug.Log("Reset!");
+			if (_charge > 0.5f)
+			{
+				_charge = 0f;
+				_detected = false;
+				_last = curr;
+			}
 		}
 		else
-			_charge += Time.deltaTime;
+		{
+			if (curr != _last)
+			{
+				_last = curr;
+				_charge = 0f;
+				_detected = false;
+				Debug.Log("Reset!");
+			}
 
-		if(curr != SoundChars.Silence && _charge > 0.02f && !_detected) {
-			_detected = true;
-			_code += SoundToChar[curr];
-			Debug.Log(str);
-			Debug.Log("PITCH INDEX " + c.pitchIndex);
+			if (_charge > 0.02f && !_detected)
+			{
+				_detected = true;
+				_code += SoundToChar[curr];
+				Debug.Log(str);
+				Debug.Log("PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue);
+			}
 		}
 		
 

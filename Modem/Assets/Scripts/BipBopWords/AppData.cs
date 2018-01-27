@@ -6,32 +6,31 @@ using System.Linq;
 
 public class AppData : Singleton<AppData>
 {
-	[SerializeField] private TextAsset _wordsDefinition;
+	//[SerializeField] private TextAsset _wordsDefinition;
 	public List<Word> AvailableWords { get; private set; }
 	public List<Word> SelectedWords;
 
 	void Awake()
 	{
-		List<string> words = new List<string>();
-
-		using (var reader = new StringReader(_wordsDefinition.text))
+		var wordsDefinition = Resources.Load("Words") as TextAsset;
+		AvailableWords = new List<Word>();
+		using (var reader = new StringReader(wordsDefinition.text))
 		{
 			string line;
+			int index = 0;
+			string category = null;
 			while ((line = reader.ReadLine()) != null)
 			{
-				if(line.StartsWith("-- "))
+				if (line.StartsWith("-- "))
 				{
-					var newline = line.Substring(3);
-					// Add to different categories until finding a new category.
+					category = line.Substring(3);
 				}
-				else words.Add(line);
+				else {
+					if (category == null)
+						throw new System.Exception("No category for word");
+					AvailableWords.Add(new Word(line, index++, category));
+				}
 			}
-		}
-
-		AvailableWords = new List<Word>(words.Count);
-		for (var i = 0; i < words.Count; i++)
-		{
-			AvailableWords.Add(new Word(words[i], i));
 		}
 
 		SelectedWords = AvailableWords

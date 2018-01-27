@@ -239,7 +239,7 @@ RectTransform:
   m_GameObject: {fileID: 732509121}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3.124662, y: 3.1246593, z: 3.1246593}
   m_Children:
   - {fileID: 2075109365}
   - {fileID: 2119185557}
@@ -249,7 +249,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 114.09, y: -224}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &732509123
@@ -291,7 +291,7 @@ MonoBehaviour:
   m_FillRect: {fileID: 359407083}
   m_HandleRect: {fileID: 1707869901}
   m_Direction: 0
-  m_MinValue: -10
+  m_MinValue: -20
   m_MaxValue: 10
   m_WholeNumbers: 0
   m_Value: 0
@@ -398,14 +398,14 @@ RectTransform:
   m_GameObject: {fileID: 824853824}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3.124662, y: 3.1246593, z: 3.1246593}
   m_Children: []
   m_Father: {fileID: 1747269599}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 175, y: -4}
+  m_AnchoredPosition: {x: 660.91, y: -236.4986}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &824853826
@@ -545,10 +545,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1239900350}
   - component: {fileID: 1239900355}
-  - component: {fileID: 1239900354}
-  - component: {fileID: 1239900353}
-  - component: {fileID: 1239900352}
   - component: {fileID: 1239900351}
+  - component: {fileID: 1239900353}
+  - component: {fileID: 1239900354}
+  - component: {fileID: 1239900352}
   - component: {fileID: 1239900356}
   m_Layer: 5
   m_Name: Main text test
@@ -572,7 +572,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 129, y: 11.8}
+  m_AnchoredPosition: {x: 29, y: 88}
   m_SizeDelta: {x: 888.2, y: 324.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1239900351
@@ -688,8 +688,8 @@ MonoBehaviour:
   rendFeedback: {fileID: 2097783898}
   maxQLen: 16
   flipsThreshold: 2
-  rrrVolumeThreshold: -1
-  avgPitchCount: 7
+  rrrVolumeThreshold: -3
+  avgPitchCount: 30
   samePitchSensitivity: 100
   txtVolumeThreshold: {fileID: 824853826}
 --- !u!114 &1239900354

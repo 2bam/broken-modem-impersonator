@@ -13,6 +13,10 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 
 	private static object _lock = new object();
 
+	protected virtual void Init()
+	{
+	}
+
 	public static T Instance
 	{
 		get
@@ -43,6 +47,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 					{
 						GameObject singleton = new GameObject();
 						_instance = singleton.AddComponent<T>();
+						(_instance as Singleton<T>).Init();
 						singleton.name = "(singleton) " + typeof(T).ToString();
 
 						DontDestroyOnLoad(singleton);

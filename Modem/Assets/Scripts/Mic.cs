@@ -7,13 +7,12 @@ public class Mic : MonoBehaviour {
 	public bool microphoneEnabled;
 	public EmissionController emissionController;
 
-
 	// Use this for initialization
 	IEnumerator Start () {
 		while (true)
 		{
 			//Debug test, press T to feed random words at random times to the selected word amount.
-			yield return new WaitUntil(()=>Input.GetKeyDown("T") && microphoneEnabled);
+			yield return new WaitUntil(()=>Input.GetKeyDown(KeyCode.T) && microphoneEnabled);
 			for (int i = 0; i < AppData.Instance.SelectedWords.Count; i++)
 			{
 				emissionController.Feed(Utility.Choice(AppData.Instance.AvailableWords));
