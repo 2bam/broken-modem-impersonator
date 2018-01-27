@@ -14,10 +14,10 @@ public class EmissionController : MonoBehaviour
 	[SerializeField] BipBopAudio _audioPlayer;
 
 	[Header("Debug")]
-	public bool PlayTestWords;
-	public List<int> testWords = new List<int>() { 1, 2, 5, 4 };
 	[SerializeField] RectTransform _wordsContainer;
 	[SerializeField] GameObject _wordPrefab;
+
+	List<Word> _currentWords;
 
 	SoundChars[] _bipBopValues = new SoundChars[Word.MAX_DIGITS];
 	Coroutine _wordEmission;
@@ -38,12 +38,25 @@ public class EmissionController : MonoBehaviour
 		_button.onClick.RemoveListener(Click);
 	}
 
-	private void Awake()
+	private void Start()
 	{
-		GenerateWordViews(testWords);
+		// Read this from AvailableWords.
+		_currentWords = new List<Word>()
+		{
+			AppData.Instance.AvailableWords[0],
+			AppData.Instance.AvailableWords[2],
+			AppData.Instance.AvailableWords[4]
+		};
+
+		GenerateWordViews(_currentWords);
 	}
 
-	private void GenerateWordViews(List<int> words)
+	public void Feed(Word word)
+	{
+
+	}
+
+	private void GenerateWordViews(List<Word> words)
 	{
 		foreach(var word in words)
 		{
@@ -54,7 +67,7 @@ public class EmissionController : MonoBehaviour
 	private void Click()
 	{
 		StopEmitting();
-		_wordEmission = PlayTestWords ? StartCoroutine(EmitWords(testWords)) : StartCoroutine(EmitWord());
+		_wordEmission = StartCoroutine(EmitWords(_currentWords));
 	}
 
 	void StopEmitting()
@@ -63,11 +76,11 @@ public class EmissionController : MonoBehaviour
 		_audioPlayer.Stop();
 	}
 
-	IEnumerator EmitWords(List<int> wordIndices)
+	IEnumerator EmitWords(List<Word> words)
 	{
-		for (var i = 0; i < wordIndices.Count; i++)
+		for (var i = 0; i < words.Count; i++)
 		{
-			var wordValue = wordIndices[i];
+			var wordValue = words[i].Id;
 			if (OnEnterWord != null)
 			{
 				print("Entered word: " + i);
@@ -104,25 +117,25 @@ public class EmissionController : MonoBehaviour
 		}
 	}
 
-	IEnumerator EmitWord()
-	{
-		var index = int.Parse(_input.text);
+	//IEnumerator EmitWord()
+	//{
+	//	var index = int.Parse(_input.text);
 
-		if (!Word.UpdateBipBopValues(index, Word.BASE, Word.MAX_DIGITS, _bipBopValues))
-		{
-			Debug.LogFormat("Can't play: {0} is over the max supported value.", index);
-			_wordEmission = null;
-			yield break;
-		}
+	//	if (!Word.UpdateBipBopValues(index, Word.BASE, Word.MAX_DIGITS, _bipBopValues))
+	//	{
+	//		Debug.LogFormat("Can't play: {0} is over the max supported value.", index);
+	//		_wordEmission = null;
+	//		yield break;
+	//	}
 
-		Debug.LogFormat("Playing: {0}", index);
-		for (var i = 0; i < _bipBopValues.Length; i++)
-		{
-			var sound = (int) _bipBopValues[i];
-			_audioPlayer.Play(sound);
-			yield return new WaitForSeconds(_seconds);
-		}
+	//	Debug.LogFormat("Playing: {0}", index);
+	//	for (var i = 0; i < _bipBopValues.Length; i++)
+	//	{
+	//		var sound = (int) _bipBopValues[i];
+	//		_audioPlayer.Play(sound);
+	//		yield return new WaitForSeconds(_seconds);
+	//	}
 
-		_wordEmission = null;
-	}
+	//	_wordEmission = null;
+	//}
 }
