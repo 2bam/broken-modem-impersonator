@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Linq;
 
 public class WordSelectPanel : MonoBehaviour {
+	public GameObject categoryPrefab;
 	public WordSelectButton wordButtonPrefab;
 	public Text txtPhrase;
 	public Vector2 spacing;
@@ -14,12 +15,18 @@ public class WordSelectPanel : MonoBehaviour {
 		Clear();
 
 		var panelXf = transform as RectTransform;
-		var buttons = new List<Button>();
-		foreach(var word in AppData.Instance.AvailableWords) {
+		var buttons = new List<WordSelectButton>();
+
+		var wordsByCat = AppData.Instance.AvailableWords
+			.OrderBy(w => w.Category)
+			.ThenBy(w => w.Text)
+			;
+
+		foreach (var word in wordsByCat) {
 			var copy = Instantiate(wordButtonPrefab);
 			copy.transform.SetParent(panelXf, false);
 			copy.Setup(this, word);
-			var b = copy.GetComponent<Button>();
+			var b = copy.GetComponent<WordSelectButton>();
 			var t = b.GetComponentInChildren<Text>();
 			t.text = word.Text;//Enumerable.Repeat("A", Random.Range(5, 10)).Aggregate("", (a, x) => a + x);
 			buttons.Add(b);
@@ -30,24 +37,38 @@ public class WordSelectPanel : MonoBehaviour {
 		
 		var panelWidth = panelXf.rect.width;
 		var pos = panelXf.position;
-		foreach(var b in buttons) {
+		string lastCat = null;
+		foreach (var b in buttons) {
 			var t = b.GetComponentInChildren<Text>();
 			var lo = b.GetComponent<LayoutGroup>();
 			var brt = b.transform as RectTransform;
+			var yMove = -brt.rect.height * brt.localScale.y;
 
-			var btnWidth = brt.rect.width * brt.localScale.x;
-			if (pos.x != 0 && pos.x + btnWidth > panelWidth)
+			if (b.word.Category != lastCat)
+			{
+				//Add category label
+				lastCat = b.word.Category;
+				var catCopy = Instantiate(categoryPrefab);
+				catCopy.transform.SetParent(panelXf, false);
+				if (pos.x != 0)
+				{
+					pos.x = 0;
+					pos.y += yMove;
+				}
+				catCopy.transform.position = pos;
+				catCopy.GetComponent<Text>().text = b.word.Category;
+				pos.y -= (catCopy.transform as RectTransform).rect.height * catCopy.transform.localScale.y;
+			}
+
+			var xMove = brt.rect.width * brt.localScale.x;
+			if (pos.x != 0 && pos.x + xMove > panelWidth)
 			{
 				pos.x = 0;
-				pos.y -= brt.rect.height * brt.localScale.y + spacing.y;
+				pos.y += yMove;
 			}
 
 			brt.position = pos;
-			pos.x += btnWidth + spacing.x;
-
-			Debug.Log("R1 " + lo.preferredWidth);
-			Debug.Log("R2 " + brt.rect.width);
-
+			pos.x += xMove + spacing.x;
 		}
 	}
 
