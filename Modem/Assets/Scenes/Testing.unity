@@ -589,6 +589,7 @@ MonoBehaviour:
   RmsValue: 0
   DbValue: 0
   PitchValue: 0
+  pitchIndex: 0
   QSamples: 2048
   pow2samples: 9
 --- !u!82 &1239900352
@@ -686,8 +687,10 @@ MonoBehaviour:
   volumeThreshold: -3
   rendFeedback: {fileID: 2097783898}
   maxQLen: 16
-  flipsThreshold: 1
+  flipsThreshold: 7
   rrrVolumeThreshold: -1
+  avgPitchCount: 7
+  samePitchSensitivity: 100
   txtVolumeThreshold: {fileID: 824853826}
 --- !u!114 &1239900354
 MonoBehaviour:

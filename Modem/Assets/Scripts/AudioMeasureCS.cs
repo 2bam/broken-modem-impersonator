@@ -7,6 +7,7 @@ public class AudioMeasureCS : MonoBehaviour
 	public float RmsValue;
 	public float DbValue;
 	public float PitchValue;
+	public int pitchIndex;
 
 	public int QSamples = 2048;//512;
 	private const float RefValue = 0.1f;
@@ -73,15 +74,15 @@ public class AudioMeasureCS : MonoBehaviour
 			freqN += 0.5f * (dR * dR - dL * dL);
 		}*/
 		PitchValue = freqN * (_fSample / 2) / QSamples; // convert index to frequency
+		pitchIndex = maxN;
 
-		var spectrum = _spectrum;
 		var offset = Vector3.zero;// var offset = Vector3.up * 5f;
-		for (var i = 1; i < spectrum.Length - 1; i++)
+		for (var i = 1; i < _spectrum.Length - 1; i++)
 		{
-			Debug.DrawLine(offset + new Vector3(i - 1, spectrum[i] + 10, 0), offset + new Vector3(i, spectrum[i + 1] + 10, 0), Color.red);
-			Debug.DrawLine(offset + new Vector3(i - 1, Mathf.Log(spectrum[i - 1]) + 10, 2), offset + new Vector3(i, Mathf.Log(spectrum[i]) + 10, 2), Color.cyan);
-			Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), spectrum[i - 1] - 10, 1), offset + new Vector3(Mathf.Log(i), spectrum[i] - 10, 1), Color.green);
-			Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), Mathf.Log(spectrum[i - 1]), 3), offset + new Vector3(Mathf.Log(i), Mathf.Log(spectrum[i]), 3), Color.blue);
+			Debug.DrawLine(offset + new Vector3(i - 1, _spectrum[i] + 10, 0), offset + new Vector3(i, _spectrum[i + 1] + 10, 0), Color.red);
+			Debug.DrawLine(offset + new Vector3(i - 1, Mathf.Log(_spectrum[i - 1]) + 10, 2), offset + new Vector3(i, Mathf.Log(_spectrum[i]) + 10, 2), Color.cyan);
+			Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), _spectrum[i - 1] - 10, 1), offset + new Vector3(Mathf.Log(i), _spectrum[i] - 10, 1), Color.green);
+			Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), Mathf.Log(_spectrum[i - 1]), 3), offset + new Vector3(Mathf.Log(i), Mathf.Log(_spectrum[i]), 3), Color.blue);
 		}
 	}
 }

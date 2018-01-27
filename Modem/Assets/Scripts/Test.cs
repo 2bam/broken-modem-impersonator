@@ -21,12 +21,25 @@ public class Test : MonoBehaviour {
 	public Renderer rendFeedback;
 	int _iFb;
 
-	Queue<float> _volumeQ = new Queue<float>();
+	struct QElem {
+		public float pitch;
+		public float volume;
+		public QElem(float Pitch, float Volume)
+		{
+			pitch = Pitch;
+			volume = Volume;
+		}
+	}
+	Queue<QElem> _queue = new Queue<QElem>();
 	public int maxQLen = 16;
 	public int flipsThreshold = 3;
 	public float rrrVolumeThreshold = 0f;
+	public int avgPitchCount = 3;
+	public float samePitchSensitivity = 100f;
 
 	public Text txtVolumeThreshold;
+
+	float _lastPitch;
 
 	// Use this for initialization
 	IEnumerator Start () {
@@ -74,29 +87,35 @@ public class Test : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		
+
+		if (Input.GetKeyDown(KeyCode.R) && Application.isEditor)
+			_code = "";
 
 		var c = GetComponent<AudioMeasureCS>();
 		var str = string.Format("P{0:0.00} V{1:0.00}", c.PitchValue, c.DbValue) + "\n"
 			+ _code;
 		GetComponent<Text>().text = str;
 
-		_volumeQ.Enqueue(c.DbValue);
-		if (_volumeQ.Count > maxQLen)
-			_volumeQ.Dequeue();
+		_queue.Enqueue(new QElem(c.PitchValue, c.DbValue));
+		if (_queue.Count > maxQLen)
+			_queue.Dequeue();
+
 		//Debug.Log(_volumeQ.Aggregate("", (a, x) => a + string.Format("  {0:0.0}", x)));
-		var flips = _volumeQ.Aggregate(
-			new { flips = 0, last = _volumeQ.Peek() > rrrVolumeThreshold }
+		var vflips = _queue.Aggregate(
+			new { flips = 0, last = _queue.Peek().volume > rrrVolumeThreshold }
 			, (a, x) =>
 				{
-					var val = x > rrrVolumeThreshold;
+					var val = x.volume > rrrVolumeThreshold;
 					return new { flips = a.flips + (val != a.last ? 1 : 0), last = val };
 				}
 			)
 			.flips;
 
-		if (flips > flipsThreshold)
-			Debug.Log("RRR " + flips);
+		var pitch = _queue
+			.Select(x => x.pitch)
+			.Take(avgPitchCount)
+			.Average();
+
 
 		if (_texFeedback != null)
 		{
@@ -109,14 +128,19 @@ public class Test : MonoBehaviour {
 		}
 
 		int curr = -1;
-		if (c.DbValue > volumeThreshold)
+
+		if (vflips > flipsThreshold && Mathf.Abs(pitch - _lastPitch) < samePitchSensitivity)
+		{
+			Debug.Log("RRR " + vflips);
+			curr = 2;
+		}
+		else if (c.DbValue > volumeThreshold)
 		{
 			//iii 350
 			//oo 550
-			curr = (c.PitchValue < 420f ? 0 : 1);
-
-
+			curr = (pitch < 300f ? 0 : 1);
 		}
+		_lastPitch = pitch;
 
 		if (curr != _last)
 		{
@@ -130,9 +154,11 @@ public class Test : MonoBehaviour {
 
 		if(curr != -1 && _charge > 0.02f && !_detected) {
 			_detected = true;
-			_code += (curr == 0 ? "I " : "O");
+			var names = new string[] { "I", "O", "R" };
+			_code += names[curr];
 
 			Debug.Log(str);
+			Debug.Log("PITCH INDEX " + c.pitchIndex);
 		}
 		
 
