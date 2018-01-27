@@ -86,6 +86,11 @@ public class EmissionController : MonoBehaviour
 		PlayAudio();
 	}
 
+	private void Win()
+	{
+		StartCoroutine(GoToEnd(true));
+	}
+
 	private void Defeat()
 	{
 		_ended = true;
@@ -98,13 +103,13 @@ public class EmissionController : MonoBehaviour
 		_emitButton.interactable = false;
 		_defeatButton.interactable = false;
 
-		StartCoroutine(GoToEndLose());
+		StartCoroutine(GoToEnd(false));
 	}
 
-	private IEnumerator GoToEndLose()
+	private IEnumerator GoToEnd(bool isWin)
 	{
 		yield return new WaitForSeconds(_waitBeforeEnd);
-		SceneManager.LoadScene("EndLose");
+		SceneManager.LoadScene(isWin ? "EndWin" : "EndLose");
 	}
 
 	void StopEmitting()
@@ -198,7 +203,7 @@ public class EmissionController : MonoBehaviour
 		if(_listeningWordsIndex >= _currentWords.Count)
 		{
 			// End.
-			if (_matchCount == _currentWords.Count) print("<color=green>WHO'S A GOOD MODEM? YOU ARE!.</color>");
+			if (_matchCount == _currentWords.Count) Win();
 			ResetRecording();
 		}
 		else
