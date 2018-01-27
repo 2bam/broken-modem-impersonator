@@ -739,7 +739,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d64659be3238c4744bbcc5ba2c62b7c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startMicOnStartup: 1
+  startMicOnStartup: 0
   stopMicrophoneListener: 0
   startMicrophoneListener: 0
   disableOutputSound: 1

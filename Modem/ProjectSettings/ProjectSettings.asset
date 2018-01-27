@@ -158,7 +158,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.Company.ProductName
+    Android: com.iam2bam.ModemBebop
     Standalone: unity.2bam+latamakuchi.Modem Bebop!
     Tizen: com.Company.ProductName
     iOS: com.Company.ProductName
