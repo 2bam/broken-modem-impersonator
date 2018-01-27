@@ -31,14 +31,25 @@ public class Test : MonoBehaviour {
 	// Use this for initialization
 	IEnumerator Start () {
 		var aud = GetComponent<AudioSource>();
-		aud.clip = Microphone.Start("Built-in Microphone", true, 10, 44100);
+		int minFreq, maxFreq;
+		for (int i = 0; i < Microphone.devices.Length; i++)
+		{
+			Microphone.GetDeviceCaps(Microphone.devices[0], out minFreq, out maxFreq);
+			Debug.Log(string.Format("Found mic[{0}] = {1} -- {2} -- {3}"
+				, i
+				, Microphone.devices[i]
+				, Microphone.IsRecording(Microphone.devices[0]) ? "MIC REC" : "MIC NO REC"
+				, "FREQ " + minFreq + "-" + maxFreq
+				));
+		}
+		aud.clip = Microphone.Start(Microphone.devices[0], true, 10, 44100);
 		aud.loop = true;
 		//aud.mute = true;
-		while (!(Microphone.GetPosition(null) > 0)) {
+		while(Microphone.GetPosition(null) <= 0) {
 			yield return null;
 			Debug.Log("Waiting mic");
 		}
-		Debug.Log("Mic on");
+		Debug.Log("Mic start " + (Microphone.IsRecording(Microphone.devices[0]) ? "MIC REC" : "MIC NO REC"));
 		aud.Play();
 
 		_texFeedback = new Texture2D(128, 512);

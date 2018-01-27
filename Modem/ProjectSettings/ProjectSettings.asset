@@ -11,8 +11,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
-  productName: Modem
+  companyName: 2bam+latamakuchi
+  productName: Modem Bebop!
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -158,8 +158,8 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.iam2bam.ModemBebop
-    Standalone: unity.DefaultCompany.Modem
+    Android: com.Company.ProductName
+    Standalone: unity.2bam+latamakuchi.Modem Bebop!
     Tizen: com.Company.ProductName
     iOS: com.Company.ProductName
     tvOS: com.Company.ProductName
@@ -565,7 +565,6 @@ PlayerSettings:
   scriptingBackend:
     Android: 0
     Standalone: 0
-    WebPlayer: 0
   incrementalIl2cppBuild: {}
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 0
