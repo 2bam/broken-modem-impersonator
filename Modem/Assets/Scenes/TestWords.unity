@@ -2352,13 +2352,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   volumeThreshold: -6.71
   rendFeedback: {fileID: 784385127}
-  maxQLen: 16
+  maxQLen: 64
   flipsThreshold: 3
-  rrrVolumeThresholdFactor: 1
-  avgPitchCount: 6
-  samePitchSensitivity: 1000
-  silenceChargeTime: 0.411
-  noteChargeTime: 0.02
+  rrrVolumeThresholdFactor: 0.7
+  avgPitchCount: 4
+  rrrSamePitchSensitivity: 1000
+  silenceChargeTime: 0.471
+  noteChargeTime: 0.0348
   txtVolumeThreshold: {fileID: 239117345}
   enableTexFeedback: 1
   sliderVolumeThreshold: {fileID: 1279063437}
@@ -2520,10 +2520,10 @@ MonoBehaviour:
       outSlope: 4.821428
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.16736844
-      value: 0.5863813
-      inSlope: 1.4066696
-      outSlope: 1.4066696
+      time: 0.088198215
+      value: 0.49263132
+      inSlope: 0.9249625
+      outSlope: 0.9249625
       tangentMode: 0
     - serializedVersion: 2
       time: 1

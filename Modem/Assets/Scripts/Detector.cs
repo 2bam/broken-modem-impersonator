@@ -36,7 +36,7 @@ public class Detector : MonoBehaviour {
 	public int flipsThreshold = 3;
 	public float rrrVolumeThresholdFactor = 1f;
 	public int avgPitchCount = 3;
-	public float samePitchSensitivity = 100f;
+	public float rrrSamePitchSensitivity = 1000f;
 
 	[Range(0f, 1f)]
 	public float silenceChargeTime = 0.5f;
@@ -132,7 +132,7 @@ public class Detector : MonoBehaviour {
 
 	}
 	// Update is called once per frame
-	void Update () {
+	void Update() {
 
 		if (Input.GetKeyDown(KeyCode.R) && Application.isEditor)
 			_code = "";
@@ -145,7 +145,7 @@ public class Detector : MonoBehaviour {
 			_queue.Dequeue();
 
 		//Debug.Log(_volumeQ.Aggregate("", (a, x) => a + string.Format("  {0:0.0}", x)));
-		var reversedQ = _queue.Reverse();		//Last first!
+		var reversedQ = _queue.Reverse();       //Last first!
 		var vflips = reversedQ.Aggregate(
 			new { flips = 0, last = reversedQ.First().volume > volumeThreshold * rrrVolumeThresholdFactor }
 			, (a, x) =>
@@ -162,8 +162,8 @@ public class Detector : MonoBehaviour {
 			.Take(avgPitchCount)
 			//.Skip(_queue.Count - avgPitchCount)
 			//.Average();
-			//.Median();
-			.Max();		//Reason: "B" and "P" parts are detected as low-freq, so use the highest
+			.Median();
+		//.Max();		//Reason: "B" and "P" parts are detected as low-freq, so use the highest
 		//var pitch = c.PitchValue;
 
 		var str = string.Format("P{0:0.00}[{2:0.00}] V{1:0.00}", c.PitchValue, c.DbValue, pitch) + "\n"
@@ -186,8 +186,13 @@ public class Detector : MonoBehaviour {
 			if (_iFb > 0)
 			{
 				var dbt = Mathf.Clamp((int)((volumeThreshold * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
+				var dbt2 = Mathf.Clamp((int)((volumeThreshold * rrrVolumeThresholdFactor * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
+				var ptf = 1600f / (48000f / 2f) * (float)c.QSamples; // convert index to frequency
+				var pt = Mathf.Clamp((int)(4f * ptf * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
 
 				TextureLine(_iFb, dbt, dbt, Color.blue);
+				TextureLine(_iFb, dbt2, dbt2, Color.gray);
+				TextureLine(_iFb, pt, pt, Color.magenta);
 				TextureLine(_iFb, _texFeedback.height / 2, _texFeedback.height / 2, Color.black);
 				TextureLine(_iFb - 1, _texFeedback.height / 2, _texFeedback.height / 2, Color.white);
 
@@ -205,8 +210,8 @@ public class Detector : MonoBehaviour {
 
 		if (
 			vflips > flipsThreshold
-			&& Mathf.Abs(pitch - _lastPitch) < samePitchSensitivity
-			&& c.DbValue > rrrVolumeThresholdFactor
+			&& Mathf.Abs(pitch - _lastPitch) < rrrSamePitchSensitivity
+			&& c.DbValue > volumeThreshold * rrrVolumeThresholdFactor
 		) {
 			Utility.LogInfo("RRR " + vflips);
 			curr = SoundChars.Rrr;
@@ -224,11 +229,16 @@ public class Detector : MonoBehaviour {
 
 		_charge += Time.deltaTime;
 
+		if (!_micProxy.microphoneEnabled)
+			_wordSounds.Clear();
+
 
 		if (curr == SoundChars.Silence)
 		{
 			if (_charge > silenceChargeTime)
 			{
+				if(curr != _last)
+					_micProxy.OnEndChar();
 				_charge = 0f;
 				_detected = false;
 				_last = curr;
@@ -244,9 +254,9 @@ public class Detector : MonoBehaviour {
 				_detected = false;
 				Utility.LogInfo("Change!");
 			}
-
-			if (_charge > noteChargeTime && !_detected)
+			else if (_charge > noteChargeTime && !_detected)
 			{
+				_micProxy.OnBeginChar(curr);
 				_detected = true;
 				_code += SoundToChar[curr];
 				_wordSounds.Enqueue(curr);
