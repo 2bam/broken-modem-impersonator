@@ -41,10 +41,10 @@ public class EmissionController : MonoBehaviour
 	int _matchCount;
 	bool _ended;
 
-	public event Action<int> OnEnterWord;
-	public event Action<int> OnExitWord;
-	public event Action<int, int> OnEnterChar;
-	public event Action<int, int> OnExitChar;
+	//public event Action<int> OnEnterWord;
+	//public event Action<int> OnExitWord;
+	//public event Action<int, int> OnEnterChar;
+	//public event Action<int, int> OnExitChar;
 
 
 	private void OnEnable()
@@ -145,7 +145,7 @@ public class EmissionController : MonoBehaviour
 			{
 				var sound = (int)_bipBopValues[j];
 				_audioPlayer.Play(sound);
-
+				_views[i].OnEnterChar(i, j);
 				yield return new WaitForSeconds(_seconds);
 			}
 
@@ -226,5 +226,11 @@ public class EmissionController : MonoBehaviour
 
 		_views[_listeningWordsIndex].ShowWordHighlight(false);
 		_emitButton.interactable = !_ended && (_matchCount != _currentWords.Count);
+		_microphone.microphoneEnabled = false;
+	}
+
+	public void OnBeginChar(int index)
+	{
+		_views[_listeningWordsIndex].OnEnterChar(_listeningWordsIndex, index);
 	}
 }

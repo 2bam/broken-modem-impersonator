@@ -73,7 +73,7 @@ public class WordView : MonoBehaviour
 		PostitionChar(charIndex);
 	}
 
-	private void ShowCharHighlight(bool v, int charIndex = 0)
+	public void ShowCharHighlight(bool v, int charIndex = 0)
 	{
 		if (_highlightChar == null) return;
 		_highlightChar.gameObject.SetActive(v);
@@ -92,6 +92,7 @@ public class WordView : MonoBehaviour
 
 	public void ShowWordHighlight(bool v)
 	{
+		ShowCharHighlight(v);
 		_highlightWord.gameObject.SetActive(v);
 	}
 

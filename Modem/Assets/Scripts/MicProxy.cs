@@ -27,6 +27,8 @@ public class MicProxy : MonoBehaviour
 
 	public void OnEndChar(int currentIndex)
 	{
+		if (microphoneEnabled) emissionController.OnBeginChar(currentIndex);
+
 		foreach (var img in soundCharImages)
 			img.color = Color.gray;
 	}
@@ -39,7 +41,9 @@ public class MicProxy : MonoBehaviour
 			img.color = Color.gray;
 		int index = (int)current;
 		if (0 <= index && index < soundCharImages.Length)
+		{
 			soundCharImages[index].color = soundCharImagesColoring[index];
+		}
 	}
 
 	public void SetInstantSoundingChar(SoundChars current)
