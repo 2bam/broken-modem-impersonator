@@ -599,8 +599,14 @@ MonoBehaviour:
     - serializedVersion: 2
       time: 0
       value: 0
-      inSlope: 2
-      outSlope: 2
+      inSlope: 4.821428
+      outSlope: 4.821428
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.16736844
+      value: 0.5863813
+      inSlope: 1.4066696
+      outSlope: 1.4066696
       tangentMode: 0
     - serializedVersion: 2
       time: 1
@@ -703,12 +709,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4095616d84b93948bf08026bbab777d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeThreshold: -9.08
+  volumeThreshold: -6.71
   rendFeedback: {fileID: 2097783898}
   maxQLen: 16
   flipsThreshold: 4
   rrrVolumeThreshold: -6
-  avgPitchCount: 4
+  avgPitchCount: 1
   samePitchSensitivity: 100
   silenceChargeTime: 0.521
   noteChargeTime: 0.02

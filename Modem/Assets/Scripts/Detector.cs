@@ -9,7 +9,7 @@ using System.Linq;
 
 //TODO: Read https://electronics.stackexchange.com/questions/239730/performing-fft-at-low-frequencies-but-high-resolution
 
-public class Test : MonoBehaviour {
+public class Detector : MonoBehaviour {
 	public float volumeThreshold = 0.18f;
 
 	string _code;

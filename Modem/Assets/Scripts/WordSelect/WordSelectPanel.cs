@@ -10,6 +10,7 @@ public class WordSelectPanel : MonoBehaviour {
 	public WordSelectButton wordButtonPrefab;
 	public Text txtPhrase;
 	public Vector2 spacing;
+	List<bool> _mistery;
 
 	// Use this for initialization
 	IEnumerator Start () {
@@ -77,12 +78,14 @@ public class WordSelectPanel : MonoBehaviour {
 	{
 		Debug.Assert(AppData.Instance.SelectedWords != null);
 		txtPhrase.text = AppData.Instance.SelectedWords
-			.Aggregate("", (a, x) => a + x.Text + " ");
+			.Select((x, i) => _mistery[i] ? "  (???)  " : x.Text)
+			.Aggregate("", (a, x) => a + x + " ");
 	}
 
 	public void Clear()
 	{
 		AppData.Instance.SelectedWords = new List<Word>();
+		_mistery = new List<bool>();
 		RefreshText();
 	}
 
@@ -93,9 +96,16 @@ public class WordSelectPanel : MonoBehaviour {
 			SceneManager.LoadScene(1);
 	}
 
+	public void AddRandomMisteryWord() {
+		AppData.Instance.SelectedWords.Add(Utility.Choice(AppData.Instance.AvailableWords));
+		_mistery.Add(true);
+		RefreshText();
+	}
+
 	public void OnWordClick(Word word)
 	{
 		AppData.Instance.SelectedWords.Add(word);
+		_mistery.Add(false);
 		RefreshText();
 	}
 
