@@ -7,14 +7,28 @@ public class Mic : MonoBehaviour
 	public bool testingMode;
 	public bool forceWin;
 	public bool microphoneEnabled;
+	public bool simulateInput;
 	public EmissionController emissionController;
+
+	public void ForceFeed()
+	{
+		forceWin = false;
+		simulateInput = true;
+	}
+
+	public void ForceFeedWin()
+	{
+		forceWin = true;
+		simulateInput = true;
+	}
 
 	// Use this for initialization
 	IEnumerator Start () {
 		while (true)
 		{
 			//Debug test, press T to feed random words at random times to the selected word amount.
-			yield return new WaitUntil(()=>Input.GetKeyDown(KeyCode.T) && microphoneEnabled);
+			yield return new WaitUntil(()=> (Input.GetKeyDown(KeyCode.T) || simulateInput) && microphoneEnabled);
+			simulateInput = false;
 
 			if (forceWin)
 			{
