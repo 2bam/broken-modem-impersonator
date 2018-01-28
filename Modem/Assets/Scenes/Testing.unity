@@ -591,8 +591,8 @@ MonoBehaviour:
   PitchValue: 0
   pitchIndex: 0
   QSamples: 2048
-  spectrumLerpFactor: 2.28
-  pow2samples: 10
+  spectrumLerpFactor: 3
+  pow2samples: 9
   spectrumMap:
     serializedVersion: 2
     m_Curve:
@@ -703,16 +703,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4095616d84b93948bf08026bbab777d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeThreshold: -0.27
+  volumeThreshold: -9.08
   rendFeedback: {fileID: 2097783898}
   maxQLen: 16
-  flipsThreshold: 6
-  rrrVolumeThreshold: -3
-  avgPitchCount: 1
+  flipsThreshold: 4
+  rrrVolumeThreshold: -6
+  avgPitchCount: 4
   samePitchSensitivity: 100
   silenceChargeTime: 0.521
-  noteChargeTime: 0.03
+  noteChargeTime: 0.02
   txtVolumeThreshold: {fileID: 824853826}
+  enableTexFeedback: 1
 --- !u!114 &1239900354
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,6 +10,11 @@ public static class Utility
 		return v[Random.Range(0, v.Count)];
 	}
 
+	public static void LogInfo(string str)
+	{
+		//Debug.Log(str);
+	}
+
 	public static float Median(this IEnumerable<float> source)
 	{
 		if (source == null)

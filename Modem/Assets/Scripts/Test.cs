@@ -43,6 +43,7 @@ public class Test : MonoBehaviour {
 	public float noteChargeTime = 0.02f;
 
 	public Text txtVolumeThreshold;
+	public bool enableTexFeedback = true;
 
 	float _lastPitch;
 	int _lastPitchIndex;
@@ -133,7 +134,7 @@ public class Test : MonoBehaviour {
 		
 		var pitch = _queue
 			.Select(x => x.pitch)
-			.Take(avgPitchCount)
+			.Skip(_queue.Count - avgPitchCount)
 			//.Average();
 			.Median();
 		//var pitch = c.PitchValue;
@@ -143,7 +144,7 @@ public class Test : MonoBehaviour {
 		GetComponent<Text>().text = str;
 
 		//Draw in texture
-		if (_texFeedback != null)
+		if (enableTexFeedback && _texFeedback != null)
 		{
 			var y0 = Mathf.Clamp((int)(c.pitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
 			var y1 = Mathf.Clamp((int)(_lastPitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
@@ -156,9 +157,12 @@ public class Test : MonoBehaviour {
 			for (int y = 0; y < _texFeedback.height; y++)
 				_texFeedback.SetPixel(_iFb, y, y0<=y&&y<=y1 ? Color.red : Color.white);
 
+			for (int y = 0; y < _texFeedback.height; y++)
+				_texFeedback.SetPixel(_iFb, y, y0 <= y && y <= y1 ? Color.red : Color.white);
+
 			if (_iFb > 0)
 			{
-				_texFeedback.SetPixel(_iFb, _texFeedback.height/2, Color.blue);
+				_texFeedback.SetPixel(_iFb, _texFeedback.height / 2, Color.blue);
 				_texFeedback.SetPixel(_iFb - 1, _texFeedback.height / 2, Color.white);
 			}
 
@@ -174,13 +178,18 @@ public class Test : MonoBehaviour {
 			&& Mathf.Abs(pitch - _lastPitch) < samePitchSensitivity
 			&& c.DbValue > rrrVolumeThreshold
 		) {
-			Debug.Log("RRR " + vflips);
+			Utility.LogInfo("RRR " + vflips);
 			curr = SoundChars.Rrr;
 		}
 		else if (c.DbValue > volumeThreshold)
 		{
 			if (2000f < pitch && pitch < 5000f) curr = SoundChars.Bip;
-			else if (200 <= pitch && pitch < 900f) curr = SoundChars.Bop;
+			else if (1f <= pitch && pitch < 900f) curr = SoundChars.Bop;
+		}
+
+		if (Input.GetKey(KeyCode.X))
+		{
+			Debug.Log("X PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue + " CALCD PITCH=" + pitch);
 		}
 
 		_lastPitch = pitch;
@@ -193,6 +202,7 @@ public class Test : MonoBehaviour {
 				_charge = 0f;
 				_detected = false;
 				_last = curr;
+				Utility.LogInfo("Reset!");
 			}
 		}
 		else
@@ -202,15 +212,15 @@ public class Test : MonoBehaviour {
 				_last = curr;
 				_charge = 0f;
 				_detected = false;
-				Debug.Log("Reset!");
+				Utility.LogInfo("Change!");
 			}
 
 			if (_charge > noteChargeTime && !_detected)
 			{
 				_detected = true;
 				_code += SoundToChar[curr];
-				Debug.Log(str);
-				Debug.Log("PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue + " CALCD PITCH="+pitch);
+				Utility.LogInfo(str);
+				Utility.LogInfo("PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue + " CALCD PITCH="+pitch);
 			}
 		}
 		
