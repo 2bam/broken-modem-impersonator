@@ -2350,21 +2350,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4095616d84b93948bf08026bbab777d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeThreshold: -1.538553
+  volumeThreshold: -13.409605
   rendFeedback: {fileID: 784385127}
-  maxQLen: 32
-  flipsThreshold: 9
-  rrrVolumeThresholdDeltaDiff: -3
-  rrrVolumeDelta: -5
-  avgPitchCount: 1
+  maxQLen: 20
+  flipsThreshold: 6
+  rrrVolumeThresholdDeltaDiff: 1
+  avgPitchCount: 2
   rrrSamePitchSensitivity: 5000
-  silenceChargeTime: 0.603
-  noteChargeTime: 0.187
+  silenceChargeTime: 0.721
+  noteChargeTime: 0.5
   txtVolumeThreshold: {fileID: 239117345}
   enableTexFeedback: 1
   sliderVolumeThreshold: {fileID: 1279063437}
   specIncPerSec: 10
   specDecPerSec: 5
+  dbAvgQAmt: 6
 --- !u!114 &1855290993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2512,7 +2512,7 @@ MonoBehaviour:
   pitchIndex: 0
   QSamples: 512
   spectrumLerpFactor: 3
-  pow2samples: 9
+  pow2samples: 10
   spectrumMap:
     serializedVersion: 2
     m_Curve:

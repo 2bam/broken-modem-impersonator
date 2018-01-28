@@ -35,7 +35,7 @@ public class Detector : MonoBehaviour {
 	public int maxQLen = 16;
 	public int flipsThreshold = 3;
 	public float rrrVolumeThresholdDeltaDiff = -3f;
-	public float rrrVolumeDelta = -5f;
+	//public float rrrVolumeDelta = -5f;
 	public int avgPitchCount = 3;
 	public float rrrSamePitchSensitivity = 1000f;
 
@@ -53,7 +53,7 @@ public class Detector : MonoBehaviour {
 	float _lastPitch;
 	int _lastPitchIndex;
 	float _lastDb;
-
+	
 	public float specIncPerSec;
 	public float specDecPerSec;
 
@@ -70,7 +70,7 @@ public class Detector : MonoBehaviour {
 	{
 		  { SoundChars.Bip, 1f }
 		, { SoundChars.Bop, 1f }
-		, { SoundChars.Rrr, 1.25f }
+		, { SoundChars.Rrr, 1.05f }
 		, { SoundChars.Silence, 0.25f }
 
 	};
@@ -165,15 +165,6 @@ public class Detector : MonoBehaviour {
 	void IncAmount(SoundChars which) {
 		specificAmount[which] += specIncPerSec * specificChargeIncFactor[which] * Time.deltaTime;
 
-		winning = specificAmount
-			.Where(kv => kv.Key != SoundChars.Silence && kv.Value > 1f)
-			.OrderByDescending(kv => kv.Value)
-			.ThenBy(kv => kv.Key == SoundChars.Rrr)
-			.Select(x => x.Key)
-			.DefaultIfEmpty(SoundChars.Silence)
-			.First()
-			;
-
 		if (specificAmount[which] > 1f)
 		{
 /*			Debug.Log("INC TH " + which.ToString());
@@ -182,6 +173,8 @@ public class Detector : MonoBehaviour {
 		if (specificAmount[which] > 2f)
 			specificAmount[which] = 2f;
 	}
+
+	public int dbAvgQAmt = 6;
 
 	private void OnDrawGizmos()
 	{
@@ -209,7 +202,7 @@ public class Detector : MonoBehaviour {
 			_queue.Dequeue();
 
 		//Debug.Log(_volumeQ.Aggregate("", (a, x) => a + string.Format("  {0:0.0}", x)));
-		var reversedQ = _queue.Reverse();       //Last first!
+		var reversedQ = _queue.Reverse().ToArray();       //Last first!
 		var vflips = reversedQ.Aggregate(
 			new { flips = 0, last = reversedQ.First().volume, ls = 1f }
 			, (a, x) =>
@@ -222,6 +215,10 @@ public class Detector : MonoBehaviour {
 			)
 			.flips;
 
+		var maxLastDb = reversedQ
+			.Take(dbAvgQAmt)
+			.Select(x => x.volume)
+			.Max();
 
 		var pitch = reversedQ
 			.Select(x => x.pitch)
@@ -252,12 +249,14 @@ public class Detector : MonoBehaviour {
 			if (_iFb > 0)
 			{
 				var dbt = Mathf.Clamp((int)((volumeThreshold * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
-				var dbt2 = Mathf.Clamp((int)(((volumeThreshold + rrrVolumeThresholdDeltaDiff) * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
+				//var dbt2 = Mathf.Clamp((int)(((volumeThreshold + rrrVolumeDelta) * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
 				var ptf = 1600f / (48000f / 2f) * (float)c.QSamples; // convert index to frequency
 				var pt = Mathf.Clamp((int)(4f * ptf * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
+				var adb = Mathf.Clamp((int)((maxLastDb * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
 
 				TextureLine(_iFb, dbt, dbt, Color.blue);
-				TextureLine(_iFb, dbt2, dbt2, Color.gray);
+				TextureLine(_iFb, adb, adb, Color.green);
+				//TextureLine(_iFb, dbt2, dbt2, Color.gray);
 				TextureLine(_iFb, pt, pt, Color.magenta);
 				TextureLine(_iFb, _texFeedback.height / 2, _texFeedback.height / 2, Color.black);
 				TextureLine(_iFb - 1, _texFeedback.height / 2, _texFeedback.height / 2, Color.white);
@@ -277,7 +276,7 @@ public class Detector : MonoBehaviour {
 		if (
 			vflips > flipsThreshold
 			//&& Mathf.Abs(pitch - _lastPitch) < rrrSamePitchSensitivity
-			&& c.DbValue > volumeThreshold - 5f
+			&& maxLastDb > volumeThreshold
 		) {
 			Utility.LogInfo("RRR " + vflips);
 			curr = SoundChars.Rrr;
@@ -310,7 +309,16 @@ public class Detector : MonoBehaviour {
 		if (!_micProxy.microphoneEnabled)
 			_wordSounds.Clear();
 
-		//Magic override
+		winning = specificAmount
+			.Where(kv => kv.Key != SoundChars.Silence && kv.Value > 1f)
+			.OrderByDescending(kv => kv.Value)
+			.ThenBy(kv => kv.Key != SoundChars.Rrr)
+			.Select(x => x.Key)
+			.DefaultIfEmpty(SoundChars.Silence)
+			.First()
+			;
+
+       //Magic override
 		curr = winning;
 
 		if (curr == SoundChars.Silence)
