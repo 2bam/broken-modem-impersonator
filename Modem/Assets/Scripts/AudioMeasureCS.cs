@@ -11,7 +11,7 @@ public class AudioMeasureCS : MonoBehaviour
 
 	public int QSamples = 2048;//512;
 	private const float RefValue = 0.1f;
-	private const float Threshold = 0.02f;
+	private const float Threshold = 0.001f;//0.02f;
 
 
 	//RR = 0.032 - 0.040s
@@ -45,11 +45,8 @@ public class AudioMeasureCS : MonoBehaviour
 	}
 
 
-	void DrawData(float[] spectrum)
+	void DrawData()
 	{
-
-
-
 		var offset = Vector3.zero;// var offset = Vector3.up * 5f;
 		var offset2 = Vector3.up * 5f;// var offset = Vector3.up * 5f;
 		var scale = 50f;
@@ -57,6 +54,7 @@ public class AudioMeasureCS : MonoBehaviour
 		float maxV1=0f, maxV2=0f;
 		Vector3 maxP1, maxP2;
 		maxP1 = maxP2 = Vector3.zero;
+		var spectrum = _spectrum;
 		for (var i = 1; i < spectrum.Length - 1; i++)
 		{
 			if (spectrum[i] > maxV1)
@@ -108,7 +106,7 @@ public class AudioMeasureCS : MonoBehaviour
 			_spectrumLerped[i] = Mathf.Lerp(_spectrumLerped[i], _spectrum[i], t);
 		}
 
-		DrawData(_spectrum);
+		DrawData();
 
 		AnalyzeSpectrum(_spectrumLerped);
 	}
@@ -125,6 +123,8 @@ public class AudioMeasureCS : MonoBehaviour
 			maxV = spec[i];
 			maxN = i; // maxN is the index of max
 		}
+		//if(maxV > 0)
+		//	Debug.Log("maxV=" + maxV);
 		float freqN = maxN; // pass the index to a float variable
 		if (maxN > 0 && maxN < QSamples - 1)
 		{ // interpolate index using neighbours

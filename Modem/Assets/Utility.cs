@@ -13,10 +13,10 @@ public static class Utility
 	public static float Median(this IEnumerable<float> source)
 	{
 		if (source == null)
-			throw new System.Exception("source");
+			throw new System.Exception("median error");
 		var data = source.OrderBy(n => n).ToArray();
 		if (data.Length == 0)
-			throw new System.Exception();
+			throw new System.Exception("median error 2");
 		if (data.Length % 2 == 0)
 			return (data[data.Length / 2 - 1] + data[data.Length / 2]) / 2.0f;
 		return data[data.Length / 2];

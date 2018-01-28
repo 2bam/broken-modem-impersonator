@@ -37,9 +37,16 @@ public class Test : MonoBehaviour {
 	public int avgPitchCount = 3;
 	public float samePitchSensitivity = 100f;
 
+	[Range(0f, 1f)]
+	public float silenceChargeTime = 0.5f;
+	[Range(0f, 0.2f)]
+	public float noteChargeTime = 0.02f;
+
 	public Text txtVolumeThreshold;
 
 	float _lastPitch;
+	int _lastPitchIndex;
+
 
 	public static readonly Dictionary<SoundChars, string> SoundToChar = new Dictionary<SoundChars, string> {
 		{ SoundChars.Bip, "I" }
@@ -50,19 +57,26 @@ public class Test : MonoBehaviour {
 
 	// Use this for initialization
 	IEnumerator Start () {
+
+		//HACK: only one slider
+		Debug.Assert(FindObjectsOfType<Slider>().Length == 1);
+		FindObjectOfType<Slider>().value = volumeThreshold;
+
 		var aud = GetComponent<AudioSource>();
 		int minFreq, maxFreq;
 		for (int i = 0; i < Microphone.devices.Length; i++)
 		{
-			Microphone.GetDeviceCaps(Microphone.devices[0], out minFreq, out maxFreq);
+			Microphone.GetDeviceCaps(Microphone.devices[i], out minFreq, out maxFreq);
 			Debug.Log(string.Format("Found mic[{0}] = {1} -- {2} -- {3}"
 				, i
 				, Microphone.devices[i]
-				, Microphone.IsRecording(Microphone.devices[0]) ? "MIC REC" : "MIC NO REC"
+				, Microphone.IsRecording(Microphone.devices[i]) ? "MIC REC" : "MIC NO REC"
 				, "FREQ " + minFreq + "-" + maxFreq
 				));
 		}
-		aud.clip = Microphone.Start(Microphone.devices[0], true, 10, 44100);
+
+		Microphone.GetDeviceCaps(Microphone.devices[0], out minFreq, out maxFreq);
+		aud.clip = Microphone.Start(Microphone.devices[0], true, 10, maxFreq);
 		aud.loop = true;
 		//aud.mute = true;
 		while(Microphone.GetPosition(null) <= 0) {
@@ -120,20 +134,34 @@ public class Test : MonoBehaviour {
 			)
 			.flips;
 
-		/*
-	var pitch = _queue
-		.Select(x => x.pitch)
-		.Take(avgPitchCount)
-		//.Average();
-		.Median();*/
-		var pitch = c.PitchValue;
+		
+		var pitch = _queue
+			.Select(x => x.pitch)
+			.Take(avgPitchCount)
+			//.Average();
+			.Median();
+		//var pitch = c.PitchValue;
 
 
 		if (_texFeedback != null)
 		{
+			var y0 = Mathf.Clamp((int)(c.pitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
+			var y1 = Mathf.Clamp((int)(_lastPitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
+			_lastPitchIndex = c.pitchIndex;
+			if (y0 > y1) {
+				var t = y0;
+				y0 = y1;
+				y1 = t;
+			}
 			for (int y = 0; y < _texFeedback.height; y++)
-				_texFeedback.SetPixel(_iFb, y, Color.white);
-			_texFeedback.SetPixel(_iFb, Mathf.Clamp((int)(c.PitchValue * 0.4f), 0, _texFeedback.height - 1), Color.red);
+				_texFeedback.SetPixel(_iFb, y, y0<=y&&y<=y1 ? Color.red : Color.white);
+
+			if (_iFb > 0)
+			{
+				_texFeedback.SetPixel(_iFb, 0, Color.blue);
+				_texFeedback.SetPixel(_iFb - 1, 0, Color.white);
+			}
+
 			_texFeedback.Apply();
 			_iFb++;
 			if (_iFb == _texFeedback.width) _iFb = 0;
@@ -150,15 +178,17 @@ public class Test : MonoBehaviour {
 		{
 			//iii 350
 			//oo 550
-			curr = pitch < 400f ? SoundChars.Bip : SoundChars.Bop;
+			if (2000f < pitch && pitch < 5000f) curr = SoundChars.Bip;
+			else if (200 <= pitch && pitch < 900f) curr = SoundChars.Bop;
+			//curr = pitch < 400f ? SoundChars.Bip : SoundChars.Bop;
 		}
-		_lastPitch = pitch;
 
+		_lastPitch = pitch;
 		_charge += Time.deltaTime;
 
 		if (curr == SoundChars.Silence)
 		{
-			if (_charge > 0.5f)
+			if (_charge > silenceChargeTime)
 			{
 				_charge = 0f;
 				_detected = false;
@@ -175,12 +205,12 @@ public class Test : MonoBehaviour {
 				Debug.Log("Reset!");
 			}
 
-			if (_charge > 0.02f && !_detected)
+			if (_charge > noteChargeTime && !_detected)
 			{
 				_detected = true;
 				_code += SoundToChar[curr];
 				Debug.Log(str);
-				Debug.Log("PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue);
+				Debug.Log("PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue + " CALCD PITCH="+pitch);
 			}
 		}
 		
