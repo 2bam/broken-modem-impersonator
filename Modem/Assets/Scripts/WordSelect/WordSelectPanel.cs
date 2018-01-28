@@ -9,6 +9,7 @@ public class WordSelectPanel : MonoBehaviour
 {
 	public RectTransform container;
 	public GameObject categoryPrefab;
+	public GameObject randomWordButton;
 	public WordSelectButton wordButtonPrefab;
 	public Text txtPhrase;
 	public Vector2 spacing;
@@ -17,8 +18,11 @@ public class WordSelectPanel : MonoBehaviour
 	//Should the word be shown as "???" (Same size of SelectedWords)
 	public List<bool> selectedHidden;
 
+	private Button randomButton;
+
 	// Use this for initialization
-	IEnumerator Start () {
+	IEnumerator Start ()
+	{
 		Clear();
 
 		var buttons = new List<WordSelectButton>();
@@ -38,8 +42,11 @@ public class WordSelectPanel : MonoBehaviour
 			buttons.Add(b);
 		}
 
-		yield return null;  //Delay for rects to work :rolleyes:
+		// Add random button at the top
+		randomButton = Instantiate(randomWordButton, container, false).GetComponent<Button>();
+		randomButton.onClick.AddListener(AddRandomMisteryWord);
 
+		yield return null;  //Delay for rects to work :rolleyes:
 
 		var accumulatedHeight = 0f;
 		var headersSpacing = 20f;
@@ -47,6 +54,19 @@ public class WordSelectPanel : MonoBehaviour
 		var panelWidth = container.rect.width;
 		var pos = Vector2.zero;
 		string lastCat = null;
+
+		// Add random category.
+		lastCat = "Random";
+
+		var randomCat = Instantiate(categoryPrefab, container, false).transform as RectTransform;
+
+		randomCat.anchoredPosition = pos;
+		randomCat.GetComponent<Text>().text = "Random";
+		pos.y -= randomCat.rect.height;
+
+		(randomButton.transform as RectTransform).anchoredPosition = pos;
+		pos.y -= (randomButton.transform as RectTransform).rect.height + headersSpacing;
+
 		foreach (var b in buttons)
 		{
 			var t = b.GetComponentInChildren<Text>();
@@ -122,6 +142,11 @@ public class WordSelectPanel : MonoBehaviour
 		selectedHidden.Add(false);
 		buttonDone.interactable = true;
 		RefreshText();
+	}
+
+	private void OnDisable()
+	{
+		randomButton.onClick.RemoveListener(AddRandomMisteryWord);
 	}
 
 }
