@@ -1696,8 +1696,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: You're an old 56k dial-up modem. You need to communicate with beeps, bops
-    and growls. Listen the message to transmit, and replay it out loud into the microphone!
+  m_Text: You're an old 56k dial-up modem. You need to communicate with beeps and
+    bops. Listen the message to transmit, and replay it out loud into the microphone!
 --- !u!222 &2018100380
 CanvasRenderer:
   m_ObjectHideFlags: 0
