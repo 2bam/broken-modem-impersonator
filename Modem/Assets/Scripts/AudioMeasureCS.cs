@@ -47,6 +47,9 @@ public class AudioMeasureCS : MonoBehaviour
 
 	void DrawData()
 	{
+		if (!Application.isEditor)
+			return;
+
 		var offset = Vector3.zero;// var offset = Vector3.up * 5f;
 		var offset2 = Vector3.up * 5f;// var offset = Vector3.up * 5f;
 		var scale = 50f;
