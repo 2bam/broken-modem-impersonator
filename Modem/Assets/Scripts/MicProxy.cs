@@ -25,6 +25,10 @@ public class MicProxy : MonoBehaviour
 		simulateInput = true;
 	}
 
+	public void OnBeginChar(SoundChars char)
+	{
+	}
+
 	public void SetInstantSoundingChar(SoundChars current)
 	{
 		foreach (var img in soundCharImages)
