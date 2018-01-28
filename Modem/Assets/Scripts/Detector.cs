@@ -147,7 +147,7 @@ public class Detector : MonoBehaviour {
 			//.Skip(_queue.Count - avgPitchCount)
 			//.Average();
 			//.Median();
-			.Max();
+			.Max();		//Reason: "B" and "P" parts are detected as low-freq, so use the highest
 		//var pitch = c.PitchValue;
 
 		var str = string.Format("P{0:0.00}[{2:0.00}] V{1:0.00}", c.PitchValue, c.DbValue, pitch) + "\n"
