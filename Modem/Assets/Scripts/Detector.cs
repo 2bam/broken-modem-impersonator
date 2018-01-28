@@ -51,6 +51,7 @@ public class Detector : MonoBehaviour {
 
 	float _lastPitch;
 	int _lastPitchIndex;
+	float _lastDb;
 
 
 	public static readonly Dictionary<SoundChars, string> SoundToChar = new Dictionary<SoundChars, string> {
@@ -91,7 +92,7 @@ public class Detector : MonoBehaviour {
 		Debug.Log("Mic start " + (Microphone.IsRecording(Microphone.devices[0]) ? "MIC REC" : "MIC NO REC"));
 		aud.Play();
 
-		_texFeedback = new Texture2D(128, 512);
+		_texFeedback = new Texture2D(128, 1024);
 		rendFeedback.material.mainTexture = _texFeedback;
 
 		/*for (int y = 0; y < _texFeedback.height; y++)
@@ -115,6 +116,21 @@ public class Detector : MonoBehaviour {
 		txtVolumeThreshold.text = (Mathf.InverseLerp(slider.minValue, slider.maxValue, slider.value) * 10f).ToString("0.0");
 	}
 
+	void TextureLine(int x, int y0, int y1, Color color) {
+		if (y0 > y1)
+		{
+			var t = y0;
+			y0 = y1;
+			y1 = t;
+		}
+		y0 -= 5;
+		y1 += 5;
+
+		for (int y = y0; y < y1; y++)
+			_texFeedback.SetPixel(_iFb, y, color);
+
+
+	}
 	// Update is called once per frame
 	void Update () {
 
@@ -157,24 +173,27 @@ public class Detector : MonoBehaviour {
 		//Draw in texture
 		if (enableTexFeedback && _texFeedback != null)
 		{
-			var y0 = Mathf.Clamp((int)(c.pitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
-			var y1 = Mathf.Clamp((int)(_lastPitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
-			_lastPitchIndex = c.pitchIndex;
-			if (y0 > y1) {
-				var t = y0;
-				y0 = y1;
-				y1 = t;
-			}
-			for (int y = 0; y < _texFeedback.height; y++)
-				_texFeedback.SetPixel(_iFb, y, y0<=y&&y<=y1 ? Color.red : Color.white);
+			int y0, y1;
+			TextureLine(_iFb, 0, _texFeedback.height, Color.white);
+			y0 = Mathf.Clamp((int)((c.DbValue * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
+			y1 = Mathf.Clamp((int)((_lastDb * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
+			TextureLine(_iFb, y0, y1, Color.cyan);
+			y0 = Mathf.Clamp((int)(4f * c.pitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
+			y1 = Mathf.Clamp((int)(4f * _lastPitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
+			TextureLine(_iFb, y0, y1, Color.red);
 
-			for (int y = 0; y < _texFeedback.height; y++)
-				_texFeedback.SetPixel(_iFb, y, y0 <= y && y <= y1 ? Color.red : Color.white);
-
+			//Draw current position pointer
 			if (_iFb > 0)
 			{
-				_texFeedback.SetPixel(_iFb, _texFeedback.height / 2, Color.blue);
-				_texFeedback.SetPixel(_iFb - 1, _texFeedback.height / 2, Color.white);
+				var dbt = Mathf.Clamp((int)((volumeThreshold * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
+
+				TextureLine(_iFb, dbt, dbt, Color.blue);
+				TextureLine(_iFb, _texFeedback.height / 2, _texFeedback.height / 2, Color.black);
+				TextureLine(_iFb - 1, _texFeedback.height / 2, _texFeedback.height / 2, Color.white);
+
+				//_texFeedback.SetPixel(_iFb, dbt, Color.blue);
+				//_texFeedback.SetPixel(_iFb, _texFeedback.height / 2, Color.black);
+				//_texFeedback.SetPixel(_iFb - 1, _texFeedback.height / 2, Color.white);
 			}
 
 			_texFeedback.Apply();
@@ -203,7 +222,6 @@ public class Detector : MonoBehaviour {
 			Debug.Log("X PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue + " CALCD PITCH=" + pitch);
 		}
 
-		_lastPitch = pitch;
 		_charge += Time.deltaTime;
 
 
@@ -252,7 +270,9 @@ public class Detector : MonoBehaviour {
 				Utility.LogInfo("PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue + " CALCD PITCH="+pitch);
 			}
 		}
-		
+		_lastPitch = pitch;
+		_lastDb = c.DbValue;
+		_lastPitchIndex = c.pitchIndex;
 		_micProxy.SetInstantSoundingChar(_last);
 
 	}
