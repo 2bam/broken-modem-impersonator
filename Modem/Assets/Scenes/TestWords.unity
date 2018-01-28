@@ -2352,8 +2352,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   volumeThreshold: -6.71
   rendFeedback: {fileID: 784385127}
-  maxQLen: 64
-  flipsThreshold: 3
+  maxQLen: 16
+  flipsThreshold: 6
   rrrVolumeThresholdFactor: 0.7
   avgPitchCount: 4
   rrrSamePitchSensitivity: 1000

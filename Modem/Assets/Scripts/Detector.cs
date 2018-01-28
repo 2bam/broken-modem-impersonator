@@ -53,6 +53,13 @@ public class Detector : MonoBehaviour {
 	int _lastPitchIndex;
 	float _lastDb;
 
+	Dictionary<SoundChars, float> specificCharge = new Dictionary<SoundChars, float>()
+	{
+		  { SoundChars.Bip, 1f }
+		, { SoundChars.Bop, 1f }
+		, { SoundChars.Rrr, 2.5f }
+		
+	};
 
 	public static readonly Dictionary<SoundChars, string> SoundToChar = new Dictionary<SoundChars, string> {
 		{ SoundChars.Bip, "I" }
@@ -211,7 +218,7 @@ public class Detector : MonoBehaviour {
 		if (
 			vflips > flipsThreshold
 			&& Mathf.Abs(pitch - _lastPitch) < rrrSamePitchSensitivity
-			&& c.DbValue > volumeThreshold * rrrVolumeThresholdFactor
+			//&& c.DbValue > volumeThreshold * rrrVolumeThresholdFactor
 		) {
 			Utility.LogInfo("RRR " + vflips);
 			curr = SoundChars.Rrr;
@@ -250,11 +257,11 @@ public class Detector : MonoBehaviour {
 			if (curr != _last)
 			{
 				_last = curr;
-				_charge = 0f;
+				//_charge = 0f;
 				_detected = false;
 				Utility.LogInfo("Change!");
 			}
-			else if (_charge > noteChargeTime && !_detected)
+			else if (_charge > noteChargeTime * specificCharge[curr] && !_detected)
 			{
 				_micProxy.OnBeginChar(curr, _wordSounds.Count);
 				_detected = true;
