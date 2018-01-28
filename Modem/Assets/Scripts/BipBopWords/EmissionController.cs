@@ -20,7 +20,7 @@ public class EmissionController : MonoBehaviour
 	[Header("Emission")]
 	[SerializeField] float _seconds;
 	[SerializeField] float _spacingSeconds;
-	[SerializeField] BipBopAudio _audioPlayer;
+	[SerializeField] AudioPlayer _audioPlayer;
 
 	[Header("Words Display")]
 	[SerializeField] RectTransform _wordsContainer;
@@ -88,6 +88,8 @@ public class EmissionController : MonoBehaviour
 
 	private void Win()
 	{
+		_ended = true;
+		BlockUI();
 		StartCoroutine(GoToEnd(true));
 	}
 
@@ -99,15 +101,20 @@ public class EmissionController : MonoBehaviour
 		ResetRecording();
 		StopEmitting();
 		RevealAnswer();
-
-		_emitButton.interactable = false;
-		_defeatButton.interactable = false;
+		BlockUI();
 
 		StartCoroutine(GoToEnd(false));
 	}
 
+	private void BlockUI()
+	{
+		_emitButton.interactable = false;
+		_defeatButton.interactable = false;
+	}
+
 	private IEnumerator GoToEnd(bool isWin)
 	{
+		_audioPlayer.PlayEndSound(isWin);
 		yield return new WaitForSeconds(_waitBeforeEnd);
 		SceneManager.LoadScene(isWin ? "EndWin" : "EndLose");
 	}
@@ -218,6 +225,6 @@ public class EmissionController : MonoBehaviour
 		_matchCount = 0;
 
 		_views[_listeningWordsIndex].ShowWordHighlight(false);
-		_emitButton.interactable = _matchCount != _currentWords.Count;
+		_emitButton.interactable = !_ended && (_matchCount != _currentWords.Count);
 	}
 }

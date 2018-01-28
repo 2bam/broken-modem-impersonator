@@ -331,7 +331,7 @@ MonoBehaviour:
   _wordsContainer: {fileID: 1472748201}
   _wordPrefab: {fileID: 1622914085166114, guid: ed872631633badf4995d46a16f7afd46,
     type: 2}
-  _waitBeforeEnd: 1
+  _waitBeforeEnd: 3
 --- !u!4 &753165909
 Transform:
   m_ObjectHideFlags: 0
@@ -421,7 +421,7 @@ GameObject:
   - component: {fileID: 867377005}
   - component: {fileID: 867377004}
   m_Layer: 0
-  m_Name: BipBopAudio
+  m_Name: AudioPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -519,6 +519,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _source: {fileID: 867377004}
+  _winClip: {fileID: 8300000, guid: e7122d2f007e5104693e130dc3b23431, type: 3}
+  _loseClip: {fileID: 8300000, guid: 6213ababc10de4e4a8dc8ef41226c644, type: 3}
   _sounds:
   - {fileID: 8300000, guid: 50b30cc9254f2ab4ca9a6ec644e0e0d9, type: 3}
   - {fileID: 8300000, guid: ebc6eb1769c17fe48b7464ddca20c90e, type: 3}
@@ -564,7 +566,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10e1780ebbeeeed45913e60784fca979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forceWin: 0
+  forceWin: 1
   microphoneEnabled: 0
   emissionController: {fileID: 753165908}
 --- !u!4 &967827716
