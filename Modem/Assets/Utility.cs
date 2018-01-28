@@ -28,7 +28,7 @@ public static class Utility
 	{
 		if (Application.isEditor)
 		{
-			//Debug.Log(str);
+			Debug.Log(str);
 		}
 	}
 

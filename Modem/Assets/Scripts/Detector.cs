@@ -34,7 +34,8 @@ public class Detector : MonoBehaviour {
 	Queue<QElem> _queue = new Queue<QElem>();
 	public int maxQLen = 16;
 	public int flipsThreshold = 3;
-	public float rrrVolumeThresholdDelta = -3f;
+	public float rrrVolumeThresholdDeltaDiff = -3f;
+	public float rrrVolumeDelta = -5f;
 	public int avgPitchCount = 3;
 	public float rrrSamePitchSensitivity = 1000f;
 
@@ -210,11 +211,13 @@ public class Detector : MonoBehaviour {
 		//Debug.Log(_volumeQ.Aggregate("", (a, x) => a + string.Format("  {0:0.0}", x)));
 		var reversedQ = _queue.Reverse();       //Last first!
 		var vflips = reversedQ.Aggregate(
-			new { flips = 0, last = reversedQ.First().volume }
+			new { flips = 0, last = reversedQ.First().volume, ls = 1f }
 			, (a, x) =>
 				{
-					var val = x.volume > volumeThreshold-5f && Mathf.Abs(x.volume - a.last) > rrrVolumeThresholdDelta;
-					return new { flips = a.flips + (val ? 1 : 0), last = x.volume };
+					var delta = a.last - x.volume;
+					var cls = Mathf.Sign(delta);
+					var val = cls*a.ls < 0 && Mathf.Abs(x.volume - a.last) > rrrVolumeThresholdDeltaDiff;
+					return new { flips = a.flips + (val ? 1 : 0), last = x.volume, ls = cls };
 				}
 			)
 			.flips;
@@ -249,7 +252,7 @@ public class Detector : MonoBehaviour {
 			if (_iFb > 0)
 			{
 				var dbt = Mathf.Clamp((int)((volumeThreshold * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
-				var dbt2 = Mathf.Clamp((int)(((volumeThreshold + rrrVolumeThresholdDelta) * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
+				var dbt2 = Mathf.Clamp((int)(((volumeThreshold + rrrVolumeThresholdDeltaDiff) * 0.01f + 0.5f) * _texFeedback.height), 0, _texFeedback.height - 1);
 				var ptf = 1600f / (48000f / 2f) * (float)c.QSamples; // convert index to frequency
 				var pt = Mathf.Clamp((int)(4f * ptf * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
 
@@ -274,7 +277,7 @@ public class Detector : MonoBehaviour {
 		if (
 			vflips > flipsThreshold
 			//&& Mathf.Abs(pitch - _lastPitch) < rrrSamePitchSensitivity
-			&& c.DbValue > volumeThreshold
+			&& c.DbValue > volumeThreshold - 5f
 		) {
 			Utility.LogInfo("RRR " + vflips);
 			curr = SoundChars.Rrr;

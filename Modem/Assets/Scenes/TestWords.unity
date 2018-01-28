@@ -2355,7 +2355,7 @@ MonoBehaviour:
   maxQLen: 32
   flipsThreshold: 9
   rrrVolumeThresholdDelta: 1
-  avgPitchCount: 3
+  avgPitchCount: 1
   rrrSamePitchSensitivity: 5000
   silenceChargeTime: 0.603
   noteChargeTime: 0.187
@@ -2505,31 +2505,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cff46f9d7e8b0f4bbc679860a6f92b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RmsValue: 0
-  DbValue: 0
+  RmsValue: 0.000069820424
+  DbValue: -63.12035
   PitchValue: 0
   pitchIndex: 0
-  QSamples: 2048
+  QSamples: 512
   spectrumLerpFactor: 3
   pow2samples: 9
   spectrumMap:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 2
-      time: 0.001045227
-      value: 0.49519348
-      inSlope: 5.1088963
-      outSlope: 5.1088963
+      time: 0.0055946857
+      value: -0.0059919357
+      inSlope: -0.17118959
+      outSlope: -0.17118959
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.096630275
-      value: 0.907527
-      inSlope: 0.27745748
-      outSlope: 0.27745748
+      time: 0.065427504
+      value: 0.9153813
+      inSlope: 9.158695
+      outSlope: 9.158695
       tangentMode: 0
     - serializedVersion: 2
       time: 1
-      value: 1
+      value: 0.9653015
       inSlope: -0.00000058449314
       outSlope: -0.00000058449314
       tangentMode: 0
