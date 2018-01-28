@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MicProxy : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class MicProxy : MonoBehaviour
 	public bool microphoneEnabled;
 	public bool simulateInput;
 	public EmissionController emissionController;
+
+	public Image[] soundCharImages;
+	public Color[] soundCharImagesColoring;
 
 	public void ForceFeed()
 	{
@@ -21,6 +25,15 @@ public class MicProxy : MonoBehaviour
 		simulateInput = true;
 	}
 
+	public void SetInstantSoundingChar(SoundChars current)
+	{
+		foreach (var img in soundCharImages)
+			img.color = Color.gray;
+		int index = (int)current;
+		if (0 <= index && index < soundCharImages.Length)
+			soundCharImages[index].color = soundCharImagesColoring[index];
+	}
+
 	public void Feed(Word word)
 	{
 		if(microphoneEnabled)
@@ -29,6 +42,8 @@ public class MicProxy : MonoBehaviour
 
 	// Use this for initialization
 	IEnumerator Start () {
+		Debug.Assert(soundCharImages.Length == soundCharImagesColoring.Length);
+		SetInstantSoundingChar(SoundChars.Silence);
 		while (true)
 		{
 			//Debug test, press T to feed random words at random times to the selected word amount.
