@@ -62,9 +62,10 @@ public class Word
 
 	public static bool UpdateBipBopValues(int @decimal, int @base, int maxDigits, SoundChars[] values)
 	{
-		if (@decimal > Mathf.Pow(@base, maxDigits))
+		var delta =  @decimal - Mathf.Pow(@base, maxDigits) + 1;
+		if (delta > 0)
 		{
-			Debug.LogError("Value would require more digits than allowed.");
+			Debug.LogError("Value would require more digits than allowed. Over by " + delta);
 			return false;
 		}
 

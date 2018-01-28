@@ -10,7 +10,10 @@ public class WordSelectPanel : MonoBehaviour {
 	public WordSelectButton wordButtonPrefab;
 	public Text txtPhrase;
 	public Vector2 spacing;
-	List<bool> _mistery;
+
+	public Button buttonDone;
+	//Should the word be shown as "???" (Same size of SelectedWords)
+	public List<bool> selectedHidden;
 
 	// Use this for initialization
 	IEnumerator Start () {
@@ -66,7 +69,7 @@ public class WordSelectPanel : MonoBehaviour {
 			if (pos.x != 0 && pos.x + xMove > panelWidth)
 			{
 				pos.x = 0;
-				pos.y += yMove;
+				pos.y += yMove + spacing.y;
 			}
 
 			brt.position = pos;
@@ -78,14 +81,15 @@ public class WordSelectPanel : MonoBehaviour {
 	{
 		Debug.Assert(AppData.Instance.SelectedWords != null);
 		txtPhrase.text = AppData.Instance.SelectedWords
-			.Zip(_mistery, (w, m) => m ? "  (???)  " : w.Text)
+			.Zip(selectedHidden, (w, m) => m ? "  (???)  " : w.Text)
 			.Aggregate("", (a, x) => a + x + " ");
 	}
 
 	public void Clear()
 	{
 		AppData.Instance.SelectedWords = new List<Word>();
-		_mistery = new List<bool>();
+		selectedHidden = new List<bool>();
+		buttonDone.interactable = false;
 		RefreshText();
 	}
 
@@ -98,14 +102,16 @@ public class WordSelectPanel : MonoBehaviour {
 
 	public void AddRandomMisteryWord() {
 		AppData.Instance.SelectedWords.Add(Utility.Choice(AppData.Instance.AvailableWords));
-		_mistery.Add(true);
+		selectedHidden.Add(true);
+		buttonDone.interactable = true;
 		RefreshText();
 	}
 
 	public void OnWordClick(Word word)
 	{
 		AppData.Instance.SelectedWords.Add(word);
-		_mistery.Add(false);
+		selectedHidden.Add(false);
+		buttonDone.interactable = true;
 		RefreshText();
 	}
 

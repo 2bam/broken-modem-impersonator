@@ -20,10 +20,12 @@ public class AppData : Singleton<AppData>
 			string category = null;
 			while ((line = reader.ReadLine()) != null)
 			{
+				line = line.Trim();
+				if (line.Length == 0)
+					continue;
+
 				if (line.StartsWith("-- "))
-				{
 					category = line.Substring(3);
-				}
 				else {
 					if (category == null)
 						throw new System.Exception("No category for word");
@@ -36,5 +38,9 @@ public class AppData : Singleton<AppData>
 			.OrderBy(x => Random.value)
 			.Take(4)
 			.ToList();
+
+		var gap = Mathf.Pow(Word.BASE, Word.MAX_DIGITS) - AvailableWords.Count;
+		if (gap != 0)
+			Debug.Log("WORD AMOUNT GAP = " + gap);
 	}
 }
