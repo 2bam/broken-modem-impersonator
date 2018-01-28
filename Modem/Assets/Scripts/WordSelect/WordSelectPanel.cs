@@ -78,7 +78,7 @@ public class WordSelectPanel : MonoBehaviour {
 	{
 		Debug.Assert(AppData.Instance.SelectedWords != null);
 		txtPhrase.text = AppData.Instance.SelectedWords
-			.Select((x, i) => _mistery[i] ? "  (???)  " : x.Text)
+			.Zip(_mistery, (w, m) => m ? "  (???)  " : w.Text)
 			.Aggregate("", (a, x) => a + x + " ");
 	}
 

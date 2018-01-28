@@ -36,7 +36,7 @@ public class EmissionController : MonoBehaviour
 	Coroutine _wordEmission;
 
 	int _listeningWordsIndex;
-	Mic _microphone;
+	MicProxy _microphone;
 
 	int _matchCount;
 	bool _ended;
@@ -61,7 +61,7 @@ public class EmissionController : MonoBehaviour
 
 	private void Start()
 	{
-		if (_microphone == null) _microphone = FindObjectOfType<Mic>();
+		if (_microphone == null) _microphone = FindObjectOfType<MicProxy>();
 
 		// Read this from AvailableWords.
 		_currentWords = AppData.Instance.SelectedWords;

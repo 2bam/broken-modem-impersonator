@@ -17,6 +17,7 @@ public class Detector : MonoBehaviour {
 	bool _detected;
 	SoundChars _last = SoundChars.Silence;
 
+	MicProxy _micProxy;
 	Texture2D _texFeedback;
 	public Renderer rendFeedback;
 	int _iFb;
@@ -45,6 +46,9 @@ public class Detector : MonoBehaviour {
 	public Text txtVolumeThreshold;
 	public bool enableTexFeedback = true;
 
+	Queue<SoundChars> _wordSounds = new Queue<SoundChars>();
+
+
 	float _lastPitch;
 	int _lastPitchIndex;
 
@@ -62,6 +66,8 @@ public class Detector : MonoBehaviour {
 		//HACK: only one slider
 		Debug.Assert(FindObjectsOfType<Slider>().Length == 1);
 		FindObjectOfType<Slider>().value = volumeThreshold;
+
+		_micProxy = FindObjectOfType<MicProxy>();
 
 		var aud = GetComponent<AudioSource>();
 		int minFreq, maxFreq;
@@ -104,7 +110,7 @@ public class Detector : MonoBehaviour {
 	public void SetVolumeThreshold(Slider slider)
 	{
 		volumeThreshold = slider.value;
-		txtVolumeThreshold.text = volumeThreshold.ToString("0.00");
+		txtVolumeThreshold.text = volumeThreshold.ToString("0.00") + "dB";
 	}
 
 	// Update is called once per frame
@@ -219,6 +225,23 @@ public class Detector : MonoBehaviour {
 			{
 				_detected = true;
 				_code += SoundToChar[curr];
+				_wordSounds.Enqueue(curr);
+				if (_wordSounds.Count == Word.MAX_DIGITS)
+				{
+					//NOTE: For different sized words the feed should be sent on a silence.
+					var word = AppData.Instance.AvailableWords
+						.FirstOrDefault(w => w.BipBopValues.Zip(_wordSounds, (s1, s2) => s1 == s2).All(x => x));
+					_code += ".";
+
+					if (word != null)
+					{
+						_micProxy.Feed(word);
+						_code += "!!";
+						_wordSounds.Clear();
+					}
+					else
+						_wordSounds.Dequeue();
+				}
 				Utility.LogInfo(str);
 				Utility.LogInfo("PITCH INDEX " + c.pitchIndex + " PITCH " + c.PitchValue + " CALCD PITCH="+pitch);
 			}

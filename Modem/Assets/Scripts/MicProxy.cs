@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mic : MonoBehaviour
+public class MicProxy : MonoBehaviour
 {
-	public bool testingMode;
 	public bool forceWin;
 	public bool microphoneEnabled;
 	public bool simulateInput;
@@ -20,6 +19,12 @@ public class Mic : MonoBehaviour
 	{
 		forceWin = true;
 		simulateInput = true;
+	}
+
+	public void Feed(Word word)
+	{
+		if(microphoneEnabled)
+			emissionController.Feed(word);
 	}
 
 	// Use this for initialization
