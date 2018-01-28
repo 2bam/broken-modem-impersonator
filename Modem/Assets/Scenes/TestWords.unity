@@ -684,7 +684,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: THE DOG ATE THE CABLE
+  m_Text: ADMIT DEFEAT
 --- !u!222 &640498631
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2360,7 +2360,7 @@ MonoBehaviour:
   silenceChargeTime: 0.471
   noteChargeTime: 0.1188
   txtVolumeThreshold: {fileID: 239117345}
-  enableTexFeedback: 1
+  enableTexFeedback: 0
   sliderVolumeThreshold: {fileID: 1279063437}
 --- !u!114 &1855290993
 MonoBehaviour:
