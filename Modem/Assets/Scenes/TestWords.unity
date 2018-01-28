@@ -684,7 +684,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: THE DOG ATE THE CABLE
+  m_Text: ADMIT DEFEAT
 --- !u!222 &640498631
 CanvasRenderer:
   m_ObjectHideFlags: 0
