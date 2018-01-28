@@ -2506,11 +2506,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cff46f9d7e8b0f4bbc679860a6f92b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RmsValue: 0.0013926898
-  DbValue: -37.122913
+  RmsValue: 0.000014681629
+  DbValue: -76.66451
   PitchValue: 0
   pitchIndex: 0
-  QSamples: 512
+  QSamples: 1024
   spectrumLerpFactor: 3
   pow2samples: 10
   spectrumMap:
@@ -2523,14 +2523,20 @@ MonoBehaviour:
       outSlope: -0.17118959
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.07720951
-      value: 1.7456946
+      time: 0.03163354
+      value: 1.7682577
       inSlope: 14.94274
       outSlope: 14.94274
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.3286533
+      value: 3.7211661
+      inSlope: 0.6426952
+      outSlope: 0.6426952
+      tangentMode: 0
+    - serializedVersion: 2
       time: 1
-      value: 0.9653015
+      value: 4.0175323
       inSlope: -0.00000058449314
       outSlope: -0.00000058449314
       tangentMode: 0
