@@ -33,6 +33,7 @@ public class AudioMeasureCS : MonoBehaviour
 		QSamples = (int)Mathf.Pow(2f, pow2samples);
 		_samples = new float[QSamples];
 		_spectrum = new float[QSamples];
+		_spectrumLerped = new float[QSamples];
 		_fSample = AudioSettings.outputSampleRate;
 		Debug.Log("Output sample rate " + _fSample);
 		_asrc = GetComponent<AudioSource>();
@@ -47,11 +48,7 @@ public class AudioMeasureCS : MonoBehaviour
 	void DrawData(float[] spectrum)
 	{
 
-		spectrum = spectrum.ToArray();
-		for (int i = 0; i < spectrum.Length; i++)
-			spectrum[i] = spectrumMap.Evaluate((float)i/spectrum.Length) * (spectrum[i]);
 
-		var t = spectrumLerpFactor * Time.deltaTime;
 
 		var offset = Vector3.zero;// var offset = Vector3.up * 5f;
 		var offset2 = Vector3.up * 5f;// var offset = Vector3.up * 5f;
@@ -73,7 +70,6 @@ public class AudioMeasureCS : MonoBehaviour
 				maxP2 = new Vector3(Mathf.Log(i), _spectrumLerped[i] * scale - 10, 1);
 			}
 			
-			_spectrumLerped[i] = Mathf.Lerp(_spectrumLerped[i], spectrum[i], t);
 
 			//Debug.DrawLine(offset + new Vector3(i - 1, spectrum[i] + 10, 0), offset + new Vector3(i, spectrum[i + 1] + 10, 0), Color.red);
 			//Debug.DrawLine(offset + new Vector3(i - 1, Mathf.Log(spectrum[i - 1]) + 10, 2), offset + new Vector3(i, Mathf.Log(spectrum[i]) + 10, 2), Color.cyan);
@@ -101,35 +97,43 @@ public class AudioMeasureCS : MonoBehaviour
 		if (DbValue < -160) DbValue = -160; // clamp it to -160dB min
 											// get sound spectrum
 
+		//Read the spectrum
 		_asrc.GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
 		// _asrc.GetSpectrumData(_spectrum, 0, FFTWindow.Hamming);
-		if (_spectrumLerped == null)
-			_spectrumLerped = _spectrum.ToArray();//copy
+
+		//Patch data from hearing curve and accumulate with interpolation.
+		var t = spectrumLerpFactor * Time.deltaTime;
+		for (int i = 0; i < _spectrum.Length; i++) {
+			_spectrum[i] = spectrumMap.Evaluate((float)i / _spectrum.Length) * (_spectrum[i]);
+			_spectrumLerped[i] = Mathf.Lerp(_spectrumLerped[i], _spectrum[i], t);
+		}
 
 		DrawData(_spectrum);
 
+		AnalyzeSpectrum(_spectrumLerped);
+	}
 
+	void AnalyzeSpectrum(float[] spec)
+	{
 		float maxV = 0;
 		var maxN = 0;
 		for (var i = 0; i < QSamples; i++)
 		{ // find max 
-			if (_spectrum[i] <= maxV || _spectrum[i] <= Threshold)
+			if (spec[i] <= maxV || spec[i] <= Threshold)
 				continue;
 
-			maxV = _spectrum[i];
+			maxV = spec[i];
 			maxN = i; // maxN is the index of max
 		}
 		float freqN = maxN; // pass the index to a float variable
 		if (maxN > 0 && maxN < QSamples - 1)
 		{ // interpolate index using neighbours
-			var dL = _spectrum[maxN - 1] / _spectrum[maxN];
-			var dR = _spectrum[maxN + 1] / _spectrum[maxN];
+			var dL = spec[maxN - 1] / _spectrum[maxN];
+			var dR = spec[maxN + 1] / _spectrum[maxN];
 			freqN += 0.5f * (dR * dR - dL * dL);
 		}
 		PitchValue = freqN * (_fSample / 2) / QSamples; // convert index to frequency
-		//PitchValue = (Mathf.Exp(freqN / QSamples)-1) * _fSample; // convert index to frequency
+														//PitchValue = (Mathf.Exp(freqN / QSamples)-1) * _fSample; // convert index to frequency
 		pitchIndex = maxN;
-
-
 	}
 }

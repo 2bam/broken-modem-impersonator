@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Mic : MonoBehaviour
 {
+	public bool testingMode;
 	public bool forceWin;
 	public bool microphoneEnabled;
 	public EmissionController emissionController;
