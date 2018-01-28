@@ -106,8 +106,6 @@ public class Test : MonoBehaviour {
 		txtVolumeThreshold.text = volumeThreshold.ToString("0.00");
 	}
 
-
-
 	// Update is called once per frame
 	void Update () {
 
@@ -115,9 +113,7 @@ public class Test : MonoBehaviour {
 			_code = "";
 
 		var c = GetComponent<AudioMeasureCS>();
-		var str = string.Format("P{0:0.00} V{1:0.00}", c.PitchValue, c.DbValue) + "\n"
-			+ _code;
-		GetComponent<Text>().text = str;
+
 
 		_queue.Enqueue(new QElem(c.PitchValue, c.DbValue));
 		if (_queue.Count > maxQLen)
@@ -142,7 +138,11 @@ public class Test : MonoBehaviour {
 			.Median();
 		//var pitch = c.PitchValue;
 
+		var str = string.Format("P{0:0.00}[{2:0.00}] V{1:0.00}", c.PitchValue, c.DbValue, pitch) + "\n"
+			+ _code;
+		GetComponent<Text>().text = str;
 
+		//Draw in texture
 		if (_texFeedback != null)
 		{
 			var y0 = Mathf.Clamp((int)(c.pitchIndex * _texFeedback.height / c.QSamples), 0, _texFeedback.height - 1);
@@ -158,8 +158,8 @@ public class Test : MonoBehaviour {
 
 			if (_iFb > 0)
 			{
-				_texFeedback.SetPixel(_iFb, 0, Color.blue);
-				_texFeedback.SetPixel(_iFb - 1, 0, Color.white);
+				_texFeedback.SetPixel(_iFb, _texFeedback.height/2, Color.blue);
+				_texFeedback.SetPixel(_iFb - 1, _texFeedback.height / 2, Color.white);
 			}
 
 			_texFeedback.Apply();
@@ -169,18 +169,18 @@ public class Test : MonoBehaviour {
 
 		SoundChars curr = SoundChars.Silence;
 
-		if (vflips > flipsThreshold && Mathf.Abs(pitch - _lastPitch) < samePitchSensitivity)
-		{
+		if (
+			vflips > flipsThreshold
+			&& Mathf.Abs(pitch - _lastPitch) < samePitchSensitivity
+			&& c.DbValue > rrrVolumeThreshold
+		) {
 			Debug.Log("RRR " + vflips);
 			curr = SoundChars.Rrr;
 		}
 		else if (c.DbValue > volumeThreshold)
 		{
-			//iii 350
-			//oo 550
 			if (2000f < pitch && pitch < 5000f) curr = SoundChars.Bip;
 			else if (200 <= pitch && pitch < 900f) curr = SoundChars.Bop;
-			//curr = pitch < 400f ? SoundChars.Bip : SoundChars.Bop;
 		}
 
 		_lastPitch = pitch;
