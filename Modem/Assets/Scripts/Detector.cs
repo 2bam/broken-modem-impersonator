@@ -69,7 +69,7 @@ public class Detector : MonoBehaviour {
 	{
 		  { SoundChars.Bip, 1f }
 		, { SoundChars.Bop, 1f }
-		, { SoundChars.Rrr, 3.5f }
+		, { SoundChars.Rrr, 1.25f }
 		, { SoundChars.Silence, 0.25f }
 
 	};
@@ -210,11 +210,11 @@ public class Detector : MonoBehaviour {
 		//Debug.Log(_volumeQ.Aggregate("", (a, x) => a + string.Format("  {0:0.0}", x)));
 		var reversedQ = _queue.Reverse();       //Last first!
 		var vflips = reversedQ.Aggregate(
-			new { flips = 0, last = reversedQ.First().volume > volumeThreshold + rrrVolumeThresholdDelta }
+			new { flips = 0, last = reversedQ.First().volume }
 			, (a, x) =>
 				{
-					var val = x.volume > volumeThreshold + rrrVolumeThresholdDelta;
-					return new { flips = a.flips + (val != a.last ? 1 : 0), last = val };
+					var val = x.volume > volumeThreshold-5f && Mathf.Abs(x.volume - a.last) > rrrVolumeThresholdDelta;
+					return new { flips = a.flips + (val ? 1 : 0), last = x.volume };
 				}
 			)
 			.flips;
@@ -273,8 +273,8 @@ public class Detector : MonoBehaviour {
 
 		if (
 			vflips > flipsThreshold
-			&& Mathf.Abs(pitch - _lastPitch) < rrrSamePitchSensitivity
-			//&& c.DbValue > volumeThreshold * rrrVolumeThresholdFactor
+			//&& Mathf.Abs(pitch - _lastPitch) < rrrSamePitchSensitivity
+			&& c.DbValue > volumeThreshold
 		) {
 			Utility.LogInfo("RRR " + vflips);
 			curr = SoundChars.Rrr;

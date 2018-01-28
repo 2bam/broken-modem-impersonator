@@ -2352,15 +2352,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   volumeThreshold: -1.538553
   rendFeedback: {fileID: 784385127}
-  maxQLen: 20
-  flipsThreshold: 5
-  rrrVolumeThresholdDelta: 0
+  maxQLen: 32
+  flipsThreshold: 9
+  rrrVolumeThresholdDelta: 1
   avgPitchCount: 3
   rrrSamePitchSensitivity: 5000
   silenceChargeTime: 0.603
-  noteChargeTime: 0.317
+  noteChargeTime: 0.187
   txtVolumeThreshold: {fileID: 239117345}
-  enableTexFeedback: 0
+  enableTexFeedback: 1
   sliderVolumeThreshold: {fileID: 1279063437}
   specIncPerSec: 10
   specDecPerSec: 5
@@ -2511,27 +2511,27 @@ MonoBehaviour:
   pitchIndex: 0
   QSamples: 2048
   spectrumLerpFactor: 3
-  pow2samples: 10
+  pow2samples: 9
   spectrumMap:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 2
-      time: 0
-      value: 0
-      inSlope: 4.821428
-      outSlope: 4.821428
+      time: 0.001045227
+      value: 0.49519348
+      inSlope: 5.1088963
+      outSlope: 5.1088963
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.1381977
-      value: 0.7238768
-      inSlope: 0.9249625
-      outSlope: 0.9249625
+      time: 0.096630275
+      value: 0.907527
+      inSlope: 0.27745748
+      outSlope: 0.27745748
       tangentMode: 0
     - serializedVersion: 2
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: -0.00000058449314
+      outSlope: -0.00000058449314
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
