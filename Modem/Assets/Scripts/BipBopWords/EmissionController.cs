@@ -166,6 +166,7 @@ public class EmissionController : MonoBehaviour
 
 		SetMode(Mode.Playing);
 		ClearWords(true);
+		SetEmitButton("Emitting...");
 	}
 
 	void RevealAnswer()
@@ -192,6 +193,7 @@ public class EmissionController : MonoBehaviour
 		_microphone.microphoneEnabled = true;
 		SetMode(Mode.Recording);
 		_views[0].ShowWordHighlight(true);
+		SetEmitButton("Listening...");
 	}
 
 	public void Feed(Word word)
@@ -227,6 +229,13 @@ public class EmissionController : MonoBehaviour
 		_views[_listeningWordsIndex].ShowWordHighlight(false);
 		_emitButton.interactable = !_ended && (_matchCount != _currentWords.Count);
 		_microphone.microphoneEnabled = false;
+
+		SetEmitButton("EMIT SOUND");
+	}
+
+	private void SetEmitButton(string text)
+	{
+		_emitButton.GetComponentInChildren<Text>().text = text;
 	}
 
 	public void OnBeginChar(int index)
