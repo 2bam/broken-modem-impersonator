@@ -36,7 +36,7 @@ public class AppData : Singleton<AppData>
 
 		SelectedWords = AvailableWords
 			.OrderBy(x => Random.value)
-			.Take(4)
+			.Take(2)
 			.ToList();
 
 		var gap = Mathf.Pow(Word.BASE, Word.MAX_DIGITS) - AvailableWords.Count;

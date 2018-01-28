@@ -34,7 +34,7 @@ public class WordView : MonoBehaviour
 
 	public void Clear(bool keepIfCorrect)
 	{
-		_text.text = !keepIfCorrect || _guessedWord != _word ? "XXXXXXX" : _word.Text;
+		_text.text = !keepIfCorrect || _guessedWord != _word ? "" : _word.Text;
 	}
 
 	public void OnEnterWord(int index)

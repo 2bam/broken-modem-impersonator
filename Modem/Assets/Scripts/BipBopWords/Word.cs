@@ -14,8 +14,8 @@ public enum SoundChars
 
 public class Word
 {
-	public const int BASE = 3;
-	public const int MAX_DIGITS = 4;
+	public const int BASE = 2;
+	public const int MAX_DIGITS = 6;
 
 	public string Text { get; private set; }
 	public string Category { get; private set; }

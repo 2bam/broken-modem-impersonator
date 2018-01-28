@@ -2,29 +2,22 @@
 Flatulent
 Pink
 Red
-Nice
 Obvious
 Nerdy
-Half-peeled
 Free
 Expensive
-Aquamarine
 Water
 Inflamed
 Greenish
 Increasingly
-Full
 Scrambled
 -- Subjects/Objects
 Platypus
 Building
-The person reading this
 The president
 Soup
 Banana
-Vomit
 Global game jam
-Cellphone
 Peyote
 Yerba mate
 Slime
@@ -32,16 +25,13 @@ Liquid
 Meat
 Paper towel
 Pizza box
-Chair
 Designer
 Temperature
 Treasure
-Music
 Game
 Throne
 Poop
 Egg
-Harakiri
 Ocean
 Seagull
 Rear
@@ -49,20 +39,16 @@ Rear
 Eats
 Is
 Sleeps
-Prays to
 Kisses
 Dies
 Snorts
 Combusted
-Prayed
 Smokes
 Jumps
 Kicks
 Goes
 Steals
 Sneaks
-Behaves Like
-Returns
 Shoots
 Farts
 Detects
@@ -74,10 +60,7 @@ One
 Many
 And
 From
-Inside
 To
-Or
-Only
 On
 Of
 Because

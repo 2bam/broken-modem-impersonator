@@ -70,7 +70,7 @@ public class Detector : MonoBehaviour {
 	{
 		  { SoundChars.Bip, 1f }
 		, { SoundChars.Bop, 1f }
-		, { SoundChars.Rrr, 1.25f }
+		, { SoundChars.Rrr, 0f }
 		, { SoundChars.Silence, 0.25f }
 
 	};

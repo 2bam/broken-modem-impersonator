@@ -29,6 +29,8 @@ public class EmissionController : MonoBehaviour
 	[Header("Ending")]
 	[SerializeField] float _waitBeforeEnd;
 
+	bool keepMatches;
+	List<bool> _matchedWords;
 	List<Word> _currentWords;
 	List<WordView> _views = new List<WordView>(10);
 
@@ -65,6 +67,12 @@ public class EmissionController : MonoBehaviour
 
 		// Read this from AvailableWords.
 		_currentWords = AppData.Instance.SelectedWords;
+		if(_matchedWords == null)_matchedWords = new List<bool>();
+		_matchedWords.Clear();
+		for (var i = 0; i<_currentWords.Count; i++)
+		{
+			_matchedWords.Add(false);
+		}
 
 		GenerateWordViews(_currentWords);
 	}
@@ -129,6 +137,13 @@ public class EmissionController : MonoBehaviour
 	{
 		for (var i = 0; i < words.Count; i++)
 		{
+			//if(keepMatches && _matchedWords[i])
+			//{
+			//	_views[i].OnEnterWord();
+			//	_views[i].OnExitWord();
+			//	continue;
+			//}
+
 			var wordValue = words[i].Id;
 
 			print("Entered word: " + i);
