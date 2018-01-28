@@ -2350,15 +2350,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4095616d84b93948bf08026bbab777d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeThreshold: -6.71
+  volumeThreshold: -1.538553
   rendFeedback: {fileID: 784385127}
-  maxQLen: 16
+  maxQLen: 32
   flipsThreshold: 6
-  rrrVolumeThresholdFactor: 0.7
+  rrrVolumeThresholdFactor: 0.1
   avgPitchCount: 4
   rrrSamePitchSensitivity: 1000
   silenceChargeTime: 0.471
-  noteChargeTime: 0.0348
+  noteChargeTime: 0.1188
   txtVolumeThreshold: {fileID: 239117345}
   enableTexFeedback: 1
   sliderVolumeThreshold: {fileID: 1279063437}
