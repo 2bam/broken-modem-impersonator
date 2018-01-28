@@ -25,19 +25,19 @@ public class MicProxy : MonoBehaviour
 		simulateInput = true;
 	}
 
-	public void OnEndChar()
+	public void OnEndChar(int currentIndex)
 	{
 		foreach (var img in soundCharImages)
 			img.color = Color.gray;
 	}
 
-	public void OnBeginChar(SoundChars character)
+	public void OnBeginChar(SoundChars current, int currentIndex)
 	{
-		Debug.Log("OnBeginChar " + character.ToString());   //delete this line, eventually
+		Debug.Log("OnBeginChar " + current.ToString() + " index=" + currentIndex);   //delete this line, eventually
 
 		foreach (var img in soundCharImages)
 			img.color = Color.gray;
-		int index = (int)character;
+		int index = (int)current;
 		if (0 <= index && index < soundCharImages.Length)
 			soundCharImages[index].color = soundCharImagesColoring[index];
 	}

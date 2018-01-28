@@ -238,7 +238,7 @@ public class Detector : MonoBehaviour {
 			if (_charge > silenceChargeTime)
 			{
 				if(curr != _last)
-					_micProxy.OnEndChar();
+					_micProxy.OnEndChar(_wordSounds.Count);
 				_charge = 0f;
 				_detected = false;
 				_last = curr;
@@ -256,7 +256,7 @@ public class Detector : MonoBehaviour {
 			}
 			else if (_charge > noteChargeTime && !_detected)
 			{
-				_micProxy.OnBeginChar(curr);
+				_micProxy.OnBeginChar(curr, _wordSounds.Count);
 				_detected = true;
 				_code += SoundToChar[curr];
 				_wordSounds.Enqueue(curr);
