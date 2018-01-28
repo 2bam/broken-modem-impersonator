@@ -47,7 +47,7 @@ public class Detector : MonoBehaviour {
 	public bool enableTexFeedback = true;
 
 	Queue<SoundChars> _wordSounds = new Queue<SoundChars>();
-
+	public Slider sliderVolumeThreshold;
 
 	float _lastPitch;
 	int _lastPitchIndex;
@@ -62,10 +62,8 @@ public class Detector : MonoBehaviour {
 
 	// Use this for initialization
 	IEnumerator Start () {
-
-		//HACK: only one slider
-		Debug.Assert(FindObjectsOfType<Slider>().Length == 1);
-		FindObjectOfType<Slider>().value = volumeThreshold;
+		volumeThreshold = PlayerPrefs.GetFloat("volumeThreshold", volumeThreshold);
+		sliderVolumeThreshold.value = -volumeThreshold;
 
 		_micProxy = FindObjectOfType<MicProxy>();
 
@@ -109,8 +107,12 @@ public class Detector : MonoBehaviour {
 
 	public void SetVolumeThreshold(Slider slider)
 	{
-		volumeThreshold = slider.value;
-		txtVolumeThreshold.text = volumeThreshold.ToString("0.00") + "dB";
+		volumeThreshold = -slider.value;
+		PlayerPrefs.SetFloat("volumeThreshold", volumeThreshold);
+		PlayerPrefs.Save();
+		//txtVolumeThreshold.text = volumeThreshold.ToString("0.0") + "dB";
+		//User friendly
+		txtVolumeThreshold.text = (Mathf.InverseLerp(slider.minValue, slider.maxValue, slider.value) * 10f).ToString("0.0");
 	}
 
 	// Update is called once per frame
@@ -138,13 +140,14 @@ public class Detector : MonoBehaviour {
 			)
 			.flips;
 
-		
+
 		var pitch = reversedQ
 			.Select(x => x.pitch)
 			.Take(avgPitchCount)
 			//.Skip(_queue.Count - avgPitchCount)
 			//.Average();
-			.Median();
+			//.Median();
+			.Max();
 		//var pitch = c.PitchValue;
 
 		var str = string.Format("P{0:0.00}[{2:0.00}] V{1:0.00}", c.PitchValue, c.DbValue, pitch) + "\n"
@@ -192,7 +195,7 @@ public class Detector : MonoBehaviour {
 		else if (c.DbValue > volumeThreshold)
 		{
 			if (2000f < pitch && pitch < 5000f) curr = SoundChars.Bip;
-			else if (1f <= pitch && pitch < 900f) curr = SoundChars.Bop;
+			else if (1f <= pitch && pitch < 1200f) curr = SoundChars.Bop;
 		}
 
 		if (Input.GetKey(KeyCode.X))
@@ -202,6 +205,7 @@ public class Detector : MonoBehaviour {
 
 		_lastPitch = pitch;
 		_charge += Time.deltaTime;
+
 
 		if (curr == SoundChars.Silence)
 		{
@@ -249,6 +253,7 @@ public class Detector : MonoBehaviour {
 			}
 		}
 		
+		_micProxy.SetInstantSoundingChar(_last);
 
 	}
 }
