@@ -25,7 +25,7 @@ public class MicProxy : MonoBehaviour
 		simulateInput = true;
 	}
 
-	public void OnBeginChar(SoundChars char)
+	public void OnBeginChar(SoundChars character)
 	{
 	}
 
