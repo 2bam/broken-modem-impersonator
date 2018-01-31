@@ -26,8 +26,10 @@ public static class Utility
 
 	public static void LogInfo(string str)
 	{
-		if(Application.isEditor)
-			Debug.Log(str);
+		if (Application.isEditor)
+		{
+			//Debug.Log(str);
+		}
 	}
 
 	public static float Median(this IEnumerable<float> source)

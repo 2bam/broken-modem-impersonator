@@ -35,7 +35,7 @@ public class MicProxy : MonoBehaviour
 
 	public void OnBeginChar(SoundChars current, int currentIndex)
 	{
-		Debug.Log("OnBeginChar " + current.ToString() + " index=" + currentIndex);   //delete this line, eventually
+		//Debug.Log("OnBeginChar " + current.ToString() + " index=" + currentIndex);   //delete this line, eventually
 
 		foreach (var img in soundCharImages)
 			img.color = Color.gray;

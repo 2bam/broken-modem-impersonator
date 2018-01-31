@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641222, b: 0.57481694, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -828,7 +828,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _emitButton: {fileID: 1399035628}
   _defeatButton: {fileID: 1249782890}
-  _seconds: 0.5
+  _seconds: 1
   _spacingSeconds: 0
   _audioPlayer: {fileID: 867377005}
   _wordsContainer: {fileID: 1472748201}
@@ -2350,18 +2350,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4095616d84b93948bf08026bbab777d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeThreshold: -1.538553
+  volumeThreshold: -13.409605
   rendFeedback: {fileID: 784385127}
-  maxQLen: 32
+  maxQLen: 20
   flipsThreshold: 6
-  rrrVolumeThresholdFactor: 0.1
-  avgPitchCount: 4
-  rrrSamePitchSensitivity: 1000
-  silenceChargeTime: 0.471
-  noteChargeTime: 0.1188
+  rrrVolumeThresholdDeltaDiff: 1
+  avgPitchCount: 2
+  rrrSamePitchSensitivity: 5000
+  silenceChargeTime: 0.721
+  noteChargeTime: 0.5
   txtVolumeThreshold: {fileID: 239117345}
-  enableTexFeedback: 0
+  enableTexFeedback: 1
   sliderVolumeThreshold: {fileID: 1279063437}
+  specIncPerSec: 10
+  specDecPerSec: 5
+  dbAvgQAmt: 6
 --- !u!114 &1855290993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2503,33 +2506,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cff46f9d7e8b0f4bbc679860a6f92b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RmsValue: 0
-  DbValue: 0
+  RmsValue: 0.000014681629
+  DbValue: -76.66451
   PitchValue: 0
   pitchIndex: 0
-  QSamples: 2048
+  QSamples: 1024
   spectrumLerpFactor: 3
-  pow2samples: 9
+  pow2samples: 10
   spectrumMap:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 2
-      time: 0
-      value: 0
-      inSlope: 4.821428
-      outSlope: 4.821428
+      time: 0.0055946857
+      value: -0.0059919357
+      inSlope: -0.17118959
+      outSlope: -0.17118959
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.088198215
-      value: 0.49263132
-      inSlope: 0.9249625
-      outSlope: 0.9249625
+      time: 0.03163354
+      value: 1.7682577
+      inSlope: 14.94274
+      outSlope: 14.94274
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.3286533
+      value: 3.7211661
+      inSlope: 0.6426952
+      outSlope: 0.6426952
       tangentMode: 0
     - serializedVersion: 2
       time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      value: 4.0175323
+      inSlope: -0.00000058449314
+      outSlope: -0.00000058449314
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
