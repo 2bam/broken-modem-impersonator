@@ -25,6 +25,7 @@ public class EmissionController : MonoBehaviour
 	[Header("Words Display")]
 	[SerializeField] RectTransform _wordsContainer;
 	[SerializeField] GameObject _wordPrefab;
+	[SerializeField] float _wordCharSize = 100f;
 
 	[Header("Ending")]
 	[SerializeField] float _waitBeforeEnd;
@@ -71,6 +72,10 @@ public class EmissionController : MonoBehaviour
 
 	private void GenerateWordViews(List<Word> words)
 	{
+		// Match size to amount of words
+		var grid = _wordsContainer.GetComponent<GridLayoutGroup>();
+		grid.cellSize = new Vector2(_wordCharSize * Word.MAX_DIGITS, grid.cellSize.y);
+
 		foreach(var word in words)
 		{
 			var wordView = Instantiate(_wordPrefab, _wordsContainer, false).GetComponent<WordView>();

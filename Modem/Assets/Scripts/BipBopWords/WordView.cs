@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class WordView : MonoBehaviour
 {
+	[SerializeField] GameObject _charPrefab;
+	[SerializeField] Transform _charsContainer;
+
 	[SerializeField] Color _listeningColor = Color.green;
 	[SerializeField] Color _recordingColor = Color.red;
 
@@ -21,6 +24,18 @@ public class WordView : MonoBehaviour
 
 	private void Awake()
 	{
+		if (_chars == null) _chars = new List<RectTransform>(Word.MAX_DIGITS);
+		for(var i = 0; i < Word.MAX_DIGITS; i++)
+		{
+			var @char = Instantiate(_charPrefab, _charsContainer, false).transform as RectTransform;
+			@char.SetSiblingIndex(i);
+
+			_chars.Add(@char);
+		}
+	}
+
+	private void Start()
+	{
 		_index = transform.GetSiblingIndex();
 		ShowCharHighlight(false);
 		ShowWordHighlight(false);
@@ -34,7 +49,7 @@ public class WordView : MonoBehaviour
 
 	public void Clear(bool keepIfCorrect)
 	{
-		_text.text = !keepIfCorrect || _guessedWord != _word ? "XXXXXXX" : _word.Text;
+		_text.text = !keepIfCorrect || _guessedWord != _word ? string.Empty : _word.Text;
 	}
 
 	public void OnEnterWord(int index)
