@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Linq;
 using System;
 
+using UnityEditor;
+
 [RequireComponent(typeof(AudioSource))]
 public class Calibration : MonoBehaviour {
 
@@ -22,6 +24,8 @@ public class Calibration : MonoBehaviour {
 	public float delayTestTone = 440f;
 	public int delayTestTimes = 4;
 	public int lodPitch = 2;
+
+	public float calibrationFreq = 48000f;
 
 	[Header("Feedback")]
 	public float delayFDT = -1f;
@@ -73,7 +77,7 @@ public class Calibration : MonoBehaviour {
 	IEnumerator _DelayCalibrationOnce(List<float> list, YieldInstruction wait, Func<float> dtFn) {
 		_asrc.Play();
 		float t = 0f;
-		while(t < delayTimeout && (Mathf.Abs(_msr.PitchValue - delayTestTone) > detectFreqThreshold || _msr.DbValue < detectVolThreshold)) {
+		while(t < delayTimeout && (Mathf.Abs(_msr.PitchValueX - delayTestTone) > detectFreqThreshold || _msr.DbValue < detectVolThreshold)) {
 			t += dtFn();
 			yield return wait;
 		}
@@ -116,12 +120,13 @@ public class Calibration : MonoBehaviour {
 
 	IEnumerator PitchVolumeCalibration(IEnumerable<float> freqs) {
 
-		fixCalcd = new AnimationCurve();
+		_msr.spectrumMap = AnimationCurve.Linear(0f, 1f, 1f, 1f);
+
 		_step = "Pitch-volume sweep (shh!)";
 
 		//octave sweep
 		var sweep = freqs.ToArray();
-		//var sweep = Enumerable.Range(1, 64).Select(i => i * 24000f / 16).ToArray();
+		//var sweep = Enumerable.Range(1, 64).Select(i => i * calibrationFreq / 2 / 16).ToArray();
 		//Create tone
 		_asrc.clip = CreateFromSamples(sweep);
 
@@ -133,7 +138,7 @@ public class Calibration : MonoBehaviour {
 		//		only move forward and resync or show desync msg if debugging
 		while(_asrc.isPlaying) {
 			for(int i = 0; i<volumes.Length; i++) {
-				if(Mathf.Abs(_msr.PitchValue - sweep[i]) < detectFreqThreshold) {
+				if(Mathf.Abs(_msr.PitchValueX - sweep[i]) < detectFreqThreshold) {
 					volumes[i].Add(_msr.DbValue);
 				}
 			}
@@ -141,9 +146,16 @@ public class Calibration : MonoBehaviour {
 		}
 
 
-		var dbs = volumes.Select(vs => vs.DefaultIfEmpty(-160f).Median() + 160f).ToArray();
+		var minVolume = -160f;
+		var maxVolume = 30f;
+		var targetVolume = 0f;
 
-		var vx = Vector3.right * (1000f / 24000f);
+		var dbs = volumes.Select(vs => vs.DefaultIfEmpty(minVolume).Median() - minVolume).ToArray();
+		fixCalcd = AnimationCurve.Linear(0f,1f,1f,1f);
+
+		//TODO: Remove unhearable before plot.
+
+		var vx = Vector3.right * (1000f / calibrationFreq / 2);
 		var vy = Vector3.up * 5f;
 		for(int i = 0; i<sweep.Length-1; i++) {
 			var fa = sweep[i]; 
@@ -151,16 +163,20 @@ public class Calibration : MonoBehaviour {
 			var va = dbs[i];
 			var vb = dbs[i+1];
 
-			fixCalcd.AddKey(fa / 24000f, 160f/va);
+			if(va-minVolume > detectVolThreshold) {
+				var kf = new Keyframe(fa, (targetVolume-minVolume)/va);
+				fixCalcd.AddKey(kf);
+			}
 
+			//AnimationUtility.SetKeyLeftTangentMode(fixCalcd, i, AnimationUtility.TangentMode.
 			Debug.DrawLine(vx * fa + vy * va, vx * fb + vy * vb, Color.red, 60f);
 			
 			//TODO: not counting LOD => Enumerable.Range(0, 11 * lod).Select(i => 27.5f * Mathf.Pow(2, (float)i/lod));
 
 			//var xa = fix.Evaluate(Mathf.Log(fa / 27.5f, 2f) / sweep.Length) * 100;
 			//var xb = fix.Evaluate(Mathf.Log(fb / 27.5f, 2f) / sweep.Length) * 100;
-			var xa = fixManual.Evaluate(fa / 24000f);
-			var xb = fixManual.Evaluate(fb / 24000f);
+			var xa = fixManual.Evaluate(fa / calibrationFreq / 2);
+			var xb = fixManual.Evaluate(fb / calibrationFreq / 2);
 			Debug.DrawLine(vx * fa + vy * xa * 100, vx * fb + vy * xb * 100, Color.blue, 60f);
 
 			var fixa2 = xa * va;
@@ -174,6 +190,9 @@ public class Calibration : MonoBehaviour {
 				, volumes[i].Count
 				));
 		}
+
+		for(int i = 0; i<fixCalcd.length; i++)
+			AnimationUtility.SetKeyBroken(fixCalcd, i, true);
 
 		_step = "Pitch-volume sweep done";
 
@@ -196,11 +215,13 @@ public class Calibration : MonoBehaviour {
 			}
 
 			if(GUILayout.Button("Full range volume calibration\n(use eachDuration=0.1)")) {
-				var big = Enumerable.Range(0, 256).Select(i => i * 24000 / 1024f);
-				//var big = Enumerable.Range(0, 1024).Select(i => i * 24000 / 1024f);
+				var big = Enumerable.Range(0, 256).Select(i => i * calibrationFreq/2 / 1024f);
+				//var big = Enumerable.Range(0, 1024).Select(i => i * calibrationFreq/2 / 1024f);
 				StartCoroutine(PitchVolumeCalibration(big));
 			}
-
+			if(GUILayout.Button("Copy fixCalcd to detector")) {
+				_msr.spectrumMap = fixCalcd;
+			}
 			if(GUILayout.Button("Stop all")) {
 				StopAllCoroutines();
 				_asrc.Stop();

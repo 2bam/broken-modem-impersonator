@@ -171,7 +171,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 65280156}
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: -313, y: -6, z: -193}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -341,7 +341,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 737762193}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5, y: 0, z: 0}
+  m_LocalPosition: {x: 5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1559674337}
@@ -350,7 +350,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}
-  m_AnchoredPosition: {x: -5, y: 0}
+  m_AnchoredPosition: {x: 5, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &743102347
@@ -439,6 +439,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1298063345}
+  - {fileID: 1423079152}
+  - {fileID: 899057186}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -510,15 +512,15 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 899057183}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 104.23532, y: -1.6800537, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 355.69992, y: -799.3996, z: 0}
+  m_LocalScale: {x: 3.12466, y: 3.12466, z: 3.12466}
   m_Children: []
-  m_Father: {fileID: 1298063345}
-  m_RootOrder: 4
+  m_Father: {fileID: 743102351}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 104.23532, y: -1.6800537}
+  m_AnchoredPosition: {x: 355.69992, y: -799.3996}
   m_SizeDelta: {x: 43.2, y: 31.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &942843908
@@ -653,10 +655,11 @@ MonoBehaviour:
   queueMaxLength: 16
   flipsThreshold: 6
   rrrVolumeThresholdDeltaDiff: 1
-  avgPitchCount: 2
+  avgPitchCount: 4
   rrrSamePitchSensitivity: 5000
-  silenceChargeTime: 0.721
-  noteChargeTime: 0.5
+  silenceChargeTime: 0.064
+  longSilenceChargeTime: 1
+  noteChargeTime: 0.038
   txtVolumeThreshold: {fileID: 899057184}
   enableTexFeedback: 1
   sliderVolumeThreshold: {fileID: 1298063344}
@@ -674,41 +677,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cff46f9d7e8b0f4bbc679860a6f92b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RmsValue: 0.000014681629
-  DbValue: -76.66451
-  PitchValue: 0
-  PitchValueY: 0
-  pitchIndex: 0
-  QSamples: 1024
-  spectrumLerpFactor: 5.53
-  pow2samples: 10
+  RmsValue: 0.031987946
+  DbValue: -9.900272
+  PitchValue: 2625
+  PitchValueY: -42.89247
+  pitchIndex: 56
+  QSamples: 512
+  spectrumLerpFactor: 3
+  pow2samples: 9
   spectrumMap:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 2
-      time: 0.0055946857
-      value: -0.0059919357
-      inSlope: -0.17118959
-      outSlope: -0.17118959
-      tangentMode: 0
+      time: 0.01351434
+      value: 0.0047590444
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
     - serializedVersion: 2
-      time: 0.03163354
-      value: 1.7682577
-      inSlope: 14.94274
-      outSlope: 14.94274
-      tangentMode: 0
+      time: 0.014087257
+      value: 0.42752284
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
     - serializedVersion: 2
-      time: 0.3286533
-      value: 3.7211661
-      inSlope: 0.6426952
-      outSlope: 0.6426952
-      tangentMode: 0
+      time: 0.050181005
+      value: 0.4557389
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
     - serializedVersion: 2
-      time: 1
-      value: 4.0175323
-      inSlope: -0.00000058449314
-      outSlope: -0.00000058449314
-      tangentMode: 0
+      time: 0.08684767
+      value: 0.9711474
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 1.0135143
+      value: 0.0047590444
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
@@ -933,15 +942,15 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1366636734}
   m_FillRect: {fileID: 1559674337}
   m_HandleRect: {fileID: 1366636732}
-  m_Direction: 0
-  m_MinValue: -10
-  m_MaxValue: 20
+  m_Direction: 1
+  m_MinValue: -50
+  m_MaxValue: 30
   m_WholeNumbers: 0
-  m_Value: 10
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 942843911}
         m_MethodName: SetVolumeThreshold
         m_Mode: 2
         m_Arguments:
@@ -967,8 +976,6 @@ RectTransform:
   - {fileID: 1025693737}
   - {fileID: 737762194}
   - {fileID: 1333516354}
-  - {fileID: 1423079152}
-  - {fileID: 899057186}
   m_Father: {fileID: 743102351}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1035,7 +1042,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1366636731}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.333336, y: 0, z: 0}
+  m_LocalPosition: {x: -17.5, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1333516354}
@@ -1103,15 +1110,15 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1423079151}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -130.22217, y: -2.8962402, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -376.89996, y: -803.19977, z: 0}
+  m_LocalScale: {x: 3.12466, y: 3.12466, z: 3.12466}
   m_Children: []
-  m_Father: {fileID: 1298063345}
-  m_RootOrder: 3
+  m_Father: {fileID: 743102351}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -130.22217, y: -2.8962402}
+  m_AnchoredPosition: {x: -376.89996, y: -803.19977}
   m_SizeDelta: {x: 90.4, y: 38.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1423079153
@@ -1179,7 +1186,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1559674336}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -23.333332, y: 0, z: 0}
+  m_LocalPosition: {x: 26.25, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 737762194}
@@ -1292,7 +1299,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.223
+  m_Volume: 0.121
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1373,24 +1380,127 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectFreqThreshold: 10
-  detectVolThreshold: -40
+  detectVolThreshold: -50
   delayTimeout: 5
   endSilence: 1
   eachDuration: 2
   delayTestTone: 440
-  delayTestTimes: 4
-  lodPitch: 3
+  delayTestTimes: 10
+  lodPitch: 1
+  calibrationFreq: 48000
   delayFDT: 0.32
   delayDT: -1
   fixManual:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.009166666
+      value: 1.2199991
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.011549275
+      value: 1.1562502
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.014551177
+      value: 1.1556364
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.23281881
+      value: 1.2285228
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.29333332
+      value: 1.7052659
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   fixCalcd:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.0022916666
+      value: Infinity
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.004583333
+      value: Infinity
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.009166666
+      value: Infinity
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.018333333
+      value: 1.1583009
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.036666665
+      value: Infinity
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.07333333
+      value: 1.1194911
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.14666666
+      value: 1.1936953
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 0.29333332
+      value: 1.3997977
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
+    - serializedVersion: 2
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 1
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4

@@ -6,7 +6,7 @@ public class AudioMeasureCS : MonoBehaviour
 {
 	public float RmsValue;
 	public float DbValue;
-	public float PitchValue;
+	public float PitchValueX;
 	public float PitchValueY;
 	public int pitchIndex;
 
@@ -14,6 +14,7 @@ public class AudioMeasureCS : MonoBehaviour
 	private const float RefValue = 0.1f;
 	private const float Threshold = 0.000001f;//0.02f;
 
+	public FFTWindow fftWindow = FFTWindow.BlackmanHarris;
 
 	//RR = 0.032 - 0.040s
 	float[] _samples;
@@ -64,9 +65,9 @@ public class AudioMeasureCS : MonoBehaviour
 		if (!Application.isEditor)
 			return;
 
-		var offset = Vector3.zero;// var offset = Vector3.up * 5f;
-		var offset2 = Vector3.up * 5f;// var offset = Vector3.up * 5f;
-		var scale = 50f;
+		var offset = Vector3.up * 50f;
+		var offset2 = Vector3.up * 350f;
+		var scale = new Vector2(100f, 10000f);
 
 		float maxV1=0f, maxV2=0f;
 		Vector3 maxP1, maxP2;
@@ -77,23 +78,43 @@ public class AudioMeasureCS : MonoBehaviour
 			if (spectrum[i] > maxV1)
 			{
 				maxV1 = spectrum[i];
-				maxP1 = new Vector3(Mathf.Log(i), spectrum[i] * scale - 10, 1);
+				maxP1 = new Vector3(Mathf.Log(i) * scale.x, spectrum[i] * scale.y, 1);
 			}
 			if (_spectrumLerped[i] > maxV2)
 			{
 				maxV2 = _spectrumLerped[i];
-				maxP2 = new Vector3(Mathf.Log(i), _spectrumLerped[i] * scale - 10, 1);
+				maxP2 = new Vector3(Mathf.Log(i) * scale.x, _spectrumLerped[i] * scale.y, 1);
 			}
 			
 
 			//Debug.DrawLine(offset + new Vector3(i - 1, spectrum[i] + 10, 0), offset + new Vector3(i, spectrum[i + 1] + 10, 0), Color.red);
 			//Debug.DrawLine(offset + new Vector3(i - 1, Mathf.Log(spectrum[i - 1]) + 10, 2), offset + new Vector3(i, Mathf.Log(spectrum[i]) + 10, 2), Color.cyan);
-			Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), spectrum[i - 1] * scale - 10, 1) , offset + new Vector3(Mathf.Log(i), spectrum[i] * scale - 10, 1) , Color.green);
 			//Debug.DrawLine(offset + new Vector3(Mathf.Log(i - 1), Mathf.Log(spectrum[i - 1]), 3), offset + new Vector3(Mathf.Log(i), Mathf.Log(spectrum[i]), 3), Color.blue);
-			Debug.DrawLine(offset2 + new Vector3(Mathf.Log(i - 1), _spectrumLerped[i - 1] * scale - 10, 1) , offset2 + new Vector3(Mathf.Log(i), _spectrumLerped[i] * scale - 10, 1) , Color.magenta);
+			Debug.DrawLine(
+				offset + new Vector3(
+					Mathf.Log(i-1) * scale.x
+					, spectrum[i - 1] * scale.y
+					)
+				, offset + new Vector3(
+					Mathf.Log(i) * scale.x
+					, spectrum[i] * scale.y
+					)
+				, Color.green
+				);
+			Debug.DrawLine(
+				offset2 + new Vector3(
+					Mathf.Log(i-1) * scale.x
+					, _spectrumLerped[i - 1] * scale.y
+					)
+				, offset2 + new Vector3(
+					Mathf.Log(i) * scale.x
+					, _spectrumLerped[i] * scale.y
+					)
+				, Color.magenta
+				);
 		}
-		Debug.DrawLine(offset + maxP1 + Vector3.up, offset + maxP1 + Vector3.down, Color.green);
-		Debug.DrawLine(offset2 + maxP2 + Vector3.up, offset2 + maxP2 + Vector3.down, Color.magenta);
+		Debug.DrawLine(offset + maxP1 + Vector3.up * 100f, offset + maxP1 + Vector3.down * 100f, Color.green);
+		Debug.DrawLine(offset2 + maxP2 + Vector3.up * 100f, offset2 + maxP2 + Vector3.down * 100f, Color.magenta);
 
 	}
 
@@ -113,13 +134,14 @@ public class AudioMeasureCS : MonoBehaviour
 											// get sound spectrum
 
 		//Read the spectrum
-		_asrc.GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
+		_asrc.GetSpectrumData(_spectrum, 0, fftWindow);
+		//_asrc.GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
 		// _asrc.GetSpectrumData(_spectrum, 0, FFTWindow.Hamming);
 
 		//Patch data from hearing curve and accumulate with interpolation.
-		var t = spectrumLerpFactor * Time.deltaTime;
+		var t = spectrumLerpFactor * Time.fixedDeltaTime;
 		for (int i = 0; i < _spectrum.Length; i++) {
-			_spectrum[i] = spectrumMap.Evaluate((float)i / _spectrum.Length) * (_spectrum[i]);
+			_spectrum[i] = spectrumMap.Evaluate((float)i / QSamples * _freqSampleRate / 2) * _spectrum[i];
 			_spectrumLerped[i] = Mathf.Lerp(_spectrumLerped[i], _spectrum[i], t);
 		}
 
@@ -155,10 +177,9 @@ public class AudioMeasureCS : MonoBehaviour
 			PitchValueY += (dR * dR - dL * dL);
 		}
 
-		PitchValueY = 20 * Mathf.Log10(PitchValueY / RefValue); // calculate dB
-
-
-		PitchValue = freqN * (_freqSampleRate / 2) / QSamples; // convert index to frequency
+		//TODO: Make linear instead of log?
+		PitchValueY = Mathf.Max(-160f, 20 * Mathf.Log10(PitchValueY / RefValue)); // calculate dB
+		PitchValueX = freqN * (_freqSampleRate / 2) / QSamples; // convert index to frequency
 														//PitchValue = (Mathf.Exp(freqN / QSamples)-1) * _fSample; // convert index to frequency
 		pitchIndex = maxN;
 	}

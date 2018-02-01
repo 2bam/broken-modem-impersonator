@@ -54,6 +54,7 @@ public class Detector : MonoBehaviour {
 
 	[Range(0f, 1f)]
 	public float silenceChargeTime = 0.5f;
+	public float longSilenceChargeTime = 0.5f;
 	[Range(0f, 0.5f)]
 	public float noteChargeTime = 0.02f;
 
@@ -85,7 +86,7 @@ public class Detector : MonoBehaviour {
 	{
 		  { SoundChars.Bip, 1f }
 		, { SoundChars.Bop, 1f }
-		, { SoundChars.Rrr, 1.05f }
+		, { SoundChars.Rrr, 1.15f }
 		, { SoundChars.Silence, 0.25f }
 
 	};
@@ -107,12 +108,12 @@ public class Detector : MonoBehaviour {
 
 	public void SetVolumeThreshold(Slider slider)
 	{
-		volumeThreshold = -slider.value;
+		volumeThreshold = slider.value;
 		PlayerPrefs.SetFloat("volumeThreshold", volumeThreshold);
 		PlayerPrefs.Save();
 		//txtVolumeThreshold.text = volumeThreshold.ToString("0.0") + "dB";
 		//User friendly
-		txtVolumeThreshold.text = (Mathf.InverseLerp(slider.minValue, slider.maxValue, slider.value) * 10f).ToString("0.0");
+		txtVolumeThreshold.text = (Mathf.InverseLerp(slider.maxValue, slider.minValue, slider.value) * 10f).ToString("0.0");
 	}
 
 
@@ -120,7 +121,7 @@ public class Detector : MonoBehaviour {
 	// Use this for initialization
 	IEnumerator Start () {
 		volumeThreshold = PlayerPrefs.GetFloat("volumeThreshold", volumeThreshold);
-		sliderVolumeThreshold.value = -volumeThreshold;	//This will trigger a SetVolumeThreshold update. 
+		sliderVolumeThreshold.value = volumeThreshold;	//This will trigger a SetVolumeThreshold update. 
 
 		if(micProxy == null)	//Avoid ifs
 			micProxy = new MicDummy();
@@ -144,53 +145,61 @@ public class Detector : MonoBehaviour {
 		asrc.Play();
 	}
 
-	void IncAmount(SoundChars which) {
-		specificAmount[which] += specIncPerSec * specificChargeIncFactor[which] * Time.deltaTime;
+	void IncAmount(SoundChars which, float mult) {
+		//TODO: Make a matrix transformation?
+
+		specificAmount[which] += mult * specIncPerSec * specificChargeIncFactor[which] * Time.fixedDeltaTime;
+		if(which == SoundChars.Rrr) {
+			specificAmount[SoundChars.Bip] -= specDecPerSec * specificChargeIncFactor[SoundChars.Bip] * Time.fixedDeltaTime;
+			specificAmount[SoundChars.Bop] -= specDecPerSec * specificChargeIncFactor[SoundChars.Bop] * Time.fixedDeltaTime;
+		}
 
 		if (specificAmount[which] > 1f)
 		{
 /*			Debug.Log("INC TH " + which.ToString());
 			Debug.Log("WINNING " + winning.ToString() );*/
 		}
-		if (specificAmount[which] > 2f)
-			specificAmount[which] = 2f;
+		specificAmount[which] = Mathf.Clamp(specificAmount[which], 0f, 2f);
 	}
 
 
 	private void OnDrawGizmos()
 	{
-		Gizmos.matrix = Matrix4x4.Scale(Vector3.one * 100f);
+		Gizmos.matrix = Matrix4x4.TRS(-Vector3.forward * 200f, Quaternion.identity, Vector3.one * 100f);
 		Gizmos.DrawCube(Vector3.right * 1f, Vector3.one + Vector3.up * specificAmount[SoundChars.Bip]);
 		Gizmos.DrawCube(Vector3.right * 3f, Vector3.one + Vector3.up * specificAmount[SoundChars.Bop]);
 		Gizmos.DrawCube(Vector3.right * 5f, Vector3.one + Vector3.up * specificAmount[SoundChars.Rrr]);
 		//Gizmos.DrawCube(Vector3.right * 7f, Vector3.one + Vector3.up * specificAmount[SoundChars.Silence]);
 	}
 
+	int vflips;
+
 	// Update is called once per frame
 	void FixedUpdate() {
 
 		foreach (var k in specificAmount.Keys.ToArray()) {
-			specificAmount[k] = Mathf.Max(0f, specificAmount[k] - specDecPerSec * Time.deltaTime);
+			specificAmount[k] = Mathf.Max(0f, specificAmount[k] - specDecPerSec * Time.fixedDeltaTime);
 		}
 
 		if (Input.GetKeyDown(KeyCode.R) && Application.isEditor)
 			_code = "";
 
 		//NOTE: THIS QUEUE'S EFFECTS WILL BE AFFECTED BY FRAMERATE IF NOT IN FIXED UPDATE.
-		_queue.Enqueue(new QElem(_msr.PitchValue, _msr.DbValue));
+		_queue.Enqueue(new QElem(_msr.PitchValueX, _msr.DbValue));
 		if (_queue.Count > queueMaxLength)
 			_queue.Dequeue();
 
 		//Debug.Log(_volumeQ.Aggregate("", (a, x) => a + string.Format("  {0:0.0}", x)));
 		var reversedQ = _queue.Reverse().ToArray();       //Make last input first!
-		var vflips = reversedQ.Aggregate(
-			new { flips = 0, last = reversedQ.First().volume, ls = 1f }
+		vflips = reversedQ.Aggregate(
+			new { flips = 0, last = reversedQ.First().volume, lastSign = 1f }
 			, (a, x) =>
 				{
 					var delta = a.last - x.volume;
-					var cls = Mathf.Sign(delta);
-					var val = cls*a.ls < 0 && Mathf.Abs(x.volume - a.last) > rrrVolumeThresholdDeltaDiff;
-					return new { flips = a.flips + (val ? 1 : 0), last = x.volume, ls = cls };
+					var sign = Mathf.Sign(delta);
+					var valid = sign*a.lastSign < 0 && Mathf.Abs(delta) > rrrVolumeThresholdDeltaDiff;
+					//Keep volume values until we find a flip, then reset
+					return new { flips = a.flips + (valid ? 1 : 0), last = (valid ? x.volume : a.last), lastSign = sign };
 				}
 			)
 			.flips;
@@ -200,8 +209,8 @@ public class Detector : MonoBehaviour {
 			.Select(x => x.pitch)
 			.Take(avgPitchCount)
 			//.Skip(_queue.Count - avgPitchCount)
-			//.Average();
-			.Median();
+			.Average();
+			//.Median();
 		//.Max();		//Reason: "B" and "P" parts are detected as low-freq, so use the highest
 		//var pitch = c.PitchValue;
 
@@ -222,28 +231,28 @@ public class Detector : MonoBehaviour {
 		) {
 			Utility.LogInfo("RRR " + vflips);
 			curr = SoundChars.Rrr;
-			IncAmount(SoundChars.Rrr);
+			IncAmount(SoundChars.Rrr, maxLastDb);
 		}
 		
 		if (_msr.DbValue > volumeThreshold)
 		{
 			SoundChars curr2 = SoundChars.Silence;
-			if (1200f < pitch && pitch < 5000f) curr2 = SoundChars.Bip;
-			else if (1f <= pitch && pitch < 1200f) curr2 = SoundChars.Bop;
+			if (2000f < pitch && pitch < 5000f) curr2 = SoundChars.Bip;
+			else if (600 <= pitch && pitch < 1200f) curr2 = SoundChars.Bop;
 			
 			if(curr2 != SoundChars.Silence)
-				IncAmount(curr2);
+				IncAmount(curr2, _msr.DbValue);
 
 			if (curr == SoundChars.Silence)
 				curr = curr2;
 		}
 
 		if (curr == SoundChars.Silence)
-			IncAmount(curr);
+			IncAmount(curr, _msr.DbValue);
 
 
 
-		_charge += Time.deltaTime;
+		_charge += Time.fixedDeltaTime;
 
 		if (!micProxy.microphoneEnabled)
 			_wordSounds.Clear();
@@ -264,8 +273,9 @@ public class Detector : MonoBehaviour {
 		{
 			if (_charge > silenceChargeTime)
 			{
-				if(curr != _last)
+				if(curr != _last) {
 					micProxy.OnEndChar(_wordSounds.Count);
+				}
 				_charge = 0f;
 				_detected = false;
 				_last = curr;
@@ -297,13 +307,13 @@ public class Detector : MonoBehaviour {
 					if (word != null)
 					{
 						micProxy.Feed(word);
-						_code += "!!";
+						_code += "--";
 						_wordSounds.Clear();
 					}
 					else
 						_wordSounds.Dequeue();
 				}
-				Utility.LogInfo("PITCH INDEX " + _msr.pitchIndex + " PITCH " + _msr.PitchValue + " CALCD PITCH="+pitch);
+				Utility.LogInfo("PITCH INDEX " + _msr.pitchIndex + " PITCH " + _msr.PitchValueX + " CALCD PITCH="+pitch);
 			}
 		}
 		_lastPitch = pitch;
@@ -313,7 +323,7 @@ public class Detector : MonoBehaviour {
 
 		if (Input.GetKey(KeyCode.X))
 		{
-			Debug.Log("X PITCH INDEX " + _msr.pitchIndex + " PITCH " + _msr.PitchValue + " CALCD PITCH=" + pitch);
+			Debug.Log("X PITCH INDEX " + _msr.pitchIndex + " PITCH " + _msr.PitchValueX + " CALCD PITCH=" + pitch);
 		}
 	}
 
@@ -371,8 +381,9 @@ public class Detector : MonoBehaviour {
 
 	void OnGUI() {
 		IMGUI.Begin(this, "Detector");
-			GUILayout.Label(string.Format("P{0:00000.00} V{1:000.00} - {2}", _msr.PitchValue, _msr.DbValue, _msr.PitchValueY));
-			GUILayout.Label("CODE:"+_code);
+			GUILayout.Label(string.Format("P{0:00000.00} V{1:000.00} - {2}", _msr.PitchValueX, _msr.DbValue, _msr.PitchValueY));
+			GUILayout.Label("CODE="+_code);
+			GUILayout.Label("vflips="+vflips);
 			GUILayout.Label("Queue will record "+ (queueMaxLength * Time.fixedDeltaTime) + " seconds");
 			_texFeedback.enabled = GUILayout.Toggle(_texFeedback.enabled, "Graphic feedback");
 		IMGUI.End();

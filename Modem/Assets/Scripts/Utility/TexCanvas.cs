@@ -11,6 +11,7 @@ public class TexCanvas {
 
 	public TexCanvas(Renderer rend, int width, int height) {
 		try {
+			_rend = rend;
 			_tex = new Texture2D(width, height);
 			_rend.material.mainTexture = _tex;
 		}
