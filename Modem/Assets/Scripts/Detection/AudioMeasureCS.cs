@@ -7,18 +7,19 @@ public class AudioMeasureCS : MonoBehaviour
 	public float RmsValue;
 	public float DbValue;
 	public float PitchValue;
+	public float PitchValueY;
 	public int pitchIndex;
 
 	public int QSamples = 2048;//512;
 	private const float RefValue = 0.1f;
-	private const float Threshold = 0.001f;//0.02f;
+	private const float Threshold = 0.000001f;//0.02f;
 
 
 	//RR = 0.032 - 0.040s
 	float[] _samples;
 	private float[] _spectrum;
 	private float[] _spectrumLerped;
-	private float _fSample;
+	private float _freqSampleRate;
 
 	public float spectrumLerpFactor;
 
@@ -28,18 +29,31 @@ public class AudioMeasureCS : MonoBehaviour
 
 	AudioSource _asrc;
 
+	void OnGUI() {
+		IMGUI.Begin(this, "AudioMeasureCS");
+			if (GUILayout.Button("Press Me"))
+				Debug.Log("Hello!");
+		IMGUI.End();
+    }
+
 	void Start()
 	{
 		QSamples = (int)Mathf.Pow(2f, pow2samples);
+		
 		_samples = new float[QSamples];
 		_spectrum = new float[QSamples];
 		_spectrumLerped = new float[QSamples];
-		_fSample = AudioSettings.outputSampleRate;
-		Debug.Log("Output sample rate " + _fSample);
+
+		_freqSampleRate = AudioSettings.outputSampleRate;
 		_asrc = GetComponent<AudioSource>();
+
+		Debug.Log("Output sample rate=" + _freqSampleRate);
+		Debug.Log("Mic sample rate=" + _freqSampleRate);
+		Debug.Log("Spectrum bins=" + QSamples);
+		Debug.Log("fixed dt=" + Time.fixedDeltaTime);
 	}
 
-	void Update()
+	void FixedUpdate()
 	{
 		AnalyzeSound();
 	}
@@ -129,13 +143,22 @@ public class AudioMeasureCS : MonoBehaviour
 		//if(maxV > 0)
 		//	Debug.Log("maxV=" + maxV);
 		float freqN = maxN; // pass the index to a float variable
+		PitchValueY = maxV;
 		if (maxN > 0 && maxN < QSamples - 1)
 		{ // interpolate index using neighbours
-			var dL = spec[maxN - 1] / _spectrum[maxN];
-			var dR = spec[maxN + 1] / _spectrum[maxN];
+			//var dL = spec[maxN - 1] / _spectrum[maxN];
+			//var dR = spec[maxN + 1] / _spectrum[maxN];
+			//freqN += 0.5f * (dR * dR - dL * dL);
+			var dL = spec[maxN - 1] / (spec[maxN]+1f);
+			var dR = spec[maxN + 1] / (spec[maxN]+1f);
 			freqN += 0.5f * (dR * dR - dL * dL);
+			PitchValueY += (dR * dR - dL * dL);
 		}
-		PitchValue = freqN * (_fSample / 2) / QSamples; // convert index to frequency
+
+		PitchValueY = 20 * Mathf.Log10(PitchValueY / RefValue); // calculate dB
+
+
+		PitchValue = freqN * (_freqSampleRate / 2) / QSamples; // convert index to frequency
 														//PitchValue = (Mathf.Exp(freqN / QSamples)-1) * _fSample; // convert index to frequency
 		pitchIndex = maxN;
 	}

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MicProxy : MonoBehaviour
+public class MicProxy : MonoBehaviour, IMicProxy
 {
 	public bool forceWin;
-	public bool microphoneEnabled;
+	public bool microphoneEnabled {get;set;}
 	public bool simulateInput;
 	public EmissionController emissionController;
 
@@ -55,6 +55,11 @@ public class MicProxy : MonoBehaviour
 		//	soundCharImages[index].color = soundCharImagesColoring[index];
 	}
 
+	public void OnLongSilence()
+	{
+		Debug.Log("OnLongSilence");
+	}
+
 	public void Feed(Word word)
 	{
 		Debug.Log("FEED " + word.Text + " (" + microphoneEnabled + ")");
@@ -64,6 +69,10 @@ public class MicProxy : MonoBehaviour
 
 	// Use this for initialization
 	IEnumerator Start () {
+		var detector = FindObjectOfType<Detector>();
+		Debug.Assert(detector != null && detector.micProxy == null, "No Detector or multiple IMicProxy");
+		detector.micProxy = this;
+
 		Debug.Assert(soundCharImages.Length == soundCharImagesColoring.Length);
 		SetInstantSoundingChar(SoundChars.Silence);
 		while (true)
