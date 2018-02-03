@@ -52,21 +52,6 @@ public class WordView : MonoBehaviour
 		_text.text = !keepIfCorrect || _guessedWord != _word ? string.Empty : _word.Text;
 	}
 
-	public void OnEnterWord(int index)
-	{
-		var isThis = index == _index;
-		ShowWordHighlight(isThis);
-		ShowCharHighlight(isThis);
-	}
-
-	public void OnExitWord(int index)
-	{
-		//if (_index != index) return;
-
-		ShowWordHighlight(false);
-		ShowCharHighlight(false);
-	}
-
 	public void OnEnterWord()
 	{
 		ShowWordHighlight(true);
@@ -77,18 +62,34 @@ public class WordView : MonoBehaviour
 		ShowWordHighlight(false);
 	}
 
-	public void OnEnterChar(int index, int charIndex)
+	public void OnEnterChar(int wordIndex, int charIndex)
 	{
 		PostitionChar(charIndex);
 	}
 
-	public void OnExitChar(int index, int charIndex)
+	public void OnReceiveWord(Word word)
 	{
-		//if (_index != index) return;
-		PostitionChar(charIndex);
+		_guessedWord = word;
+		_text.color = (word == _word) ? Color.green : Color.red;
+		_text.text = word.Text;
+
+		// Moving to the next, unhighlight this one.
+		ShowWordHighlight(false);
 	}
 
-	public void ShowCharHighlight(bool v, int charIndex = 0)
+	public void SetMode(Mode mode)
+	{
+		_text.color = Color.grey;
+		_highlightWord.GetComponent<Image>().color = mode == Mode.Recording ? _recordingColor : _listeningColor;
+	}
+
+	public void Reveal()
+	{
+		ShowWordHighlight(false);
+		_text.text = _word.Text;
+	}
+
+	private void ShowCharHighlight(bool v, int charIndex = 0)
 	{
 		if (_highlightChar == null) return;
 		_highlightChar.gameObject.SetActive(v);
@@ -105,27 +106,9 @@ public class WordView : MonoBehaviour
 		_highlightChar.anchoredPosition = newPos;
 	}
 
-	public void ShowWordHighlight(bool v)
+	private void ShowWordHighlight(bool v)
 	{
 		ShowCharHighlight(v);
 		_highlightWord.gameObject.SetActive(v);
-	}
-
-	public void OnReceiveWord(Word word)
-	{
-		_guessedWord = word;
-		_text.color = (word == _word) ? Color.green : Color.red;
-		_text.text = word.Text;
-	}
-
-	public void SetMode(Mode mode)
-	{
-		_text.color = Color.grey;
-		_highlightWord.GetComponent<Image>().color = mode == Mode.Recording ? _recordingColor : _listeningColor;
-	}
-
-	public void Reveal()
-	{
-		_text.text = _word.Text;
 	}
 }

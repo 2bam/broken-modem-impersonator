@@ -19,7 +19,6 @@ public class EmissionController : MonoBehaviour
 
 	[Header("Emission")]
 	[SerializeField] float _seconds;
-	[SerializeField] float _spacingSeconds;
 	[SerializeField] AudioPlayer _audioPlayer;
 
 	[Header("Words Display")]
@@ -30,23 +29,24 @@ public class EmissionController : MonoBehaviour
 	[Header("Ending")]
 	[SerializeField] float _waitBeforeEnd;
 
+	// Game State
 	List<Word> _currentWords;
-	List<WordView> _views = new List<WordView>(10);
-
-	SoundChars[] _bipBopValues = new SoundChars[Word.MAX_DIGITS];
-	Coroutine _wordEmission;
 
 	int _listeningWordsIndex;
-	MicProxy _microphone;
 
+	List<bool> _matchedWords;
 	int _matchCount;
 	bool _ended;
 
-	//public event Action<int> OnEnterWord;
-	//public event Action<int> OnExitWord;
-	//public event Action<int, int> OnEnterChar;
-	//public event Action<int, int> OnExitChar;
+	// Emission control
+	SoundChars[] _bipBopValues = new SoundChars[Word.MAX_DIGITS];
+	Coroutine _wordEmission;
 
+	// Mic
+	MicProxy _microphone;
+
+	// Views.
+	List<WordView> _views = new List<WordView>(10);
 
 	private void OnEnable()
 	{
@@ -67,6 +67,15 @@ public class EmissionController : MonoBehaviour
 		// Read this from AvailableWords.
 		_currentWords = AppData.Instance.SelectedWords;
 
+		// Initialize matched words to false.
+		if (_matchedWords == null) _matchedWords = new List<bool>();
+		_matchedWords.Clear();
+
+		for (var i = 0; i < _currentWords.Count; i++)
+		{
+			_matchedWords.Add(false);
+		}
+
 		GenerateWordViews(_currentWords);
 	}
 
@@ -76,7 +85,7 @@ public class EmissionController : MonoBehaviour
 		var grid = _wordsContainer.GetComponent<GridLayoutGroup>();
 		grid.cellSize = new Vector2(_wordCharSize * Word.MAX_DIGITS, grid.cellSize.y);
 
-		foreach(var word in words)
+		foreach (var word in words)
 		{
 			var wordView = Instantiate(_wordPrefab, _wordsContainer, false).GetComponent<WordView>();
 			wordView.Set(word);
@@ -86,35 +95,25 @@ public class EmissionController : MonoBehaviour
 		ClearWords(false);
 	}
 
-	private void Emit()
-	{
-		PlayAudio();
-	}
-
-	private void Win()
-	{
-		_ended = true;
-		BlockUI();
-		StartCoroutine(GoToEnd(true));
-	}
-
 	private void Defeat()
 	{
-		_ended = true;
-		print("<color=red>Someone cut the cable... loser!</color>");
-
-		ResetRecording();
 		StopEmitting();
-		RevealAnswer();
-		BlockUI();
+		ResetRecording(false);
 
-		StartCoroutine(GoToEnd(false));
+		RevealAnswer();
+
+		GameEnded(false);
 	}
 
-	private void BlockUI()
+	private void GameEnded(bool isWin)
 	{
+		_ended = true;
+
+		// Block UI
 		_emitButton.interactable = false;
 		_defeatButton.interactable = false;
+
+		StartCoroutine(GoToEnd(isWin));
 	}
 
 	private IEnumerator GoToEnd(bool isWin)
@@ -124,16 +123,40 @@ public class EmissionController : MonoBehaviour
 		SceneManager.LoadScene(isWin ? "EndWin" : "EndLose");
 	}
 
-	void StopEmitting()
+	#region Playing
+
+	private void Emit()
+	{
+		// Playing sound for the player.
+		_microphone.microphoneEnabled = false;
+		_emitButton.interactable = false;
+
+		StopEmitting();
+		_wordEmission = StartCoroutine(EmitWords(_currentWords));
+
+		SetMode(Mode.Playing);
+		SetEmitButton("Emitting...");
+	}
+
+	private void StopEmitting()
 	{
 		if (_wordEmission != null) StopCoroutine(_wordEmission);
 		_audioPlayer.Stop();
 	}
 
-	IEnumerator EmitWords(List<Word> words)
+	private IEnumerator EmitWords(List<Word> words)
 	{
+		ClearWords(true);
+
 		for (var i = 0; i < words.Count; i++)
 		{
+			// Skip already matched words.
+			if (_matchedWords[i])
+			{
+				_views[i].OnExitWord();
+				continue;
+			}
+
 			var wordValue = words[i].Id;
 
 			print("Entered word: " + i);
@@ -148,7 +171,7 @@ public class EmissionController : MonoBehaviour
 
 			for (var j = 0; j < _bipBopValues.Length; j++)
 			{
-				var sound = (int)_bipBopValues[j];
+				var sound = (int) _bipBopValues[j];
 				_audioPlayer.Play(sound);
 				_views[i].OnEnterChar(i, j);
 				yield return new WaitForSeconds(_seconds);
@@ -158,84 +181,122 @@ public class EmissionController : MonoBehaviour
 			_views[i].OnExitWord();
 		}
 
-		Record();
+		StartListening();
+
+		_wordEmission = null;
 	}
 
-	void PlayAudio()
+	#endregion
+
+	#region Listening
+
+	public void Feed(Word word)
 	{
-		_microphone.microphoneEnabled = false;
-		_emitButton.interactable = false;
+		// Receive detected words.
 
-		StopEmitting();
-		_wordEmission = StartCoroutine(EmitWords(_currentWords));
+		if (_ended) return;
 
-		SetMode(Mode.Playing);
-		ClearWords(true);
-		SetEmitButton("Emitting...");
+		// Check if it's the same word we're expecting.
+		if (word == _currentWords[_listeningWordsIndex])
+		{
+			_matchedWords[_listeningWordsIndex] = true;
+			_matchCount++;
+		}
+
+		// Inform the view.
+		_views[_listeningWordsIndex].OnReceiveWord(word);
+
+		_listeningWordsIndex++;
+		CheckForSkipsOrEnd();
 	}
 
-	void RevealAnswer()
+	private void StartListening()
+	{
+		_microphone.microphoneEnabled = true;
+		SetMode(Mode.Recording);
+		SetEmitButton("Listening...");
+
+		// Skip first matches.
+		CheckForSkipsOrEnd();
+	}
+
+	private void CheckForSkipsOrEnd()
+	{
+		// Just hightlight the word if it's the first and wasn't guessed yet.
+		if(_listeningWordsIndex == 0 && !_matchedWords[0])
+		{
+			_views[0].OnEnterWord();
+			return;
+		}
+
+		if(WinOrReset()) return;
+
+		while (_listeningWordsIndex < _currentWords.Count && _matchedWords[_listeningWordsIndex])
+		{
+			// User doesn't need to utter the sounds.
+			_views[_listeningWordsIndex].OnReceiveWord(_currentWords[_listeningWordsIndex]);
+			_listeningWordsIndex++;
+		}
+
+		// Check if we reached the last one with the skips.
+		if (WinOrReset()) return;
+
+		// Highlight the next not matched word.
+		_views[_listeningWordsIndex].OnEnterWord();
+	}
+
+	private bool WinOrReset()
+	{
+		if (_listeningWordsIndex < _currentWords.Count) return false;
+
+		// End listening. Either we won or need to replay the sounds.
+		if (_matchCount == _currentWords.Count)
+		{
+			GameEnded(true);
+			return true;
+		}
+
+		ResetRecording(!_ended && (_matchCount != _currentWords.Count));
+		return true;
+	}
+
+	private void ResetRecording(bool allowEmission)
+	{
+		_listeningWordsIndex = 0;
+
+		// Allow re-emitting words if the player didn't get them all right.
+		_emitButton.interactable = allowEmission;
+		_microphone.microphoneEnabled = false;
+
+		SetEmitButton("EMIT SOUND");
+	}
+
+	#endregion
+
+	#region Views
+
+	public void OnBeginChar(int index)
+	{
+		if (_ended) return;
+		_views[_listeningWordsIndex].OnEnterChar(_listeningWordsIndex, index);
+	}
+
+	private void RevealAnswer()
 	{
 		_views.ForEach(v =>
 		{
-			v.ShowWordHighlight(false);
 			v.Reveal();
 		});
 	}
 
-	void ClearWords(bool keepIfCorrect)
+	private void ClearWords(bool keepIfCorrect)
 	{
 		_views.ForEach(v => v.Clear(keepIfCorrect));
 	}
 
-	void SetMode(Mode mode)
+	private void SetMode(Mode mode)
 	{
 		_views.ForEach(v => v.SetMode(mode));
-	}
-
-	void Record()
-	{
-		_microphone.microphoneEnabled = true;
-		SetMode(Mode.Recording);
-		_views[0].ShowWordHighlight(true);
-		SetEmitButton("Listening...");
-	}
-
-	public void Feed(Word word)
-	{
-		if (_ended) return;
-
-		// Receive word by word.
-		// Check if it's the same word.
-		if (word == _currentWords[_listeningWordsIndex]) _matchCount++;
-
-		_views[_listeningWordsIndex].OnReceiveWord(word);
-
-		_views[_listeningWordsIndex].ShowWordHighlight(false);
-		_listeningWordsIndex++;
-
-		if(_listeningWordsIndex >= _currentWords.Count)
-		{
-			// End.
-			if (_matchCount == _currentWords.Count) Win();
-			ResetRecording();
-		}
-		else
-		{
-			_views[_listeningWordsIndex].ShowWordHighlight(true);
-		}
-	}
-
-	private void ResetRecording()
-	{
-		_listeningWordsIndex = 0;
-		_matchCount = 0;
-
-		_views[_listeningWordsIndex].ShowWordHighlight(false);
-		_emitButton.interactable = !_ended && (_matchCount != _currentWords.Count);
-		_microphone.microphoneEnabled = false;
-
-		SetEmitButton("EMIT SOUND");
 	}
 
 	private void SetEmitButton(string text)
@@ -243,8 +304,5 @@ public class EmissionController : MonoBehaviour
 		_emitButton.GetComponentInChildren<Text>().text = text;
 	}
 
-	public void OnBeginChar(int index)
-	{
-		_views[_listeningWordsIndex].OnEnterChar(_listeningWordsIndex, index);
-	}
+	#endregion
 }
