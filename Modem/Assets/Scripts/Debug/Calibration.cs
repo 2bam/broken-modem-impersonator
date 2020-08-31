@@ -42,6 +42,7 @@ public class Calibration : MonoBehaviour {
 	const int rate = 44000;
 	const int channels = 1;
 
+
 	AudioClip CreateFromSamples(float[] freqs) {
 		var eachSamples = (int)(rate * eachDuration);
 		var silenceSamples = (int)(rate * endSilence);
@@ -120,7 +121,8 @@ public class Calibration : MonoBehaviour {
 
 	IEnumerator PitchVolumeCalibration(IEnumerable<float> freqs) {
 
-		_msr.spectrumMap = AnimationCurve.Linear(0f, 1f, 1f, 1f);
+		var applySpectrumMapPrev = _msr.applySpectrumMap;
+		_msr.applySpectrumMap = false;
 
 		_step = "Pitch-volume sweep (shh!)";
 
@@ -196,6 +198,7 @@ public class Calibration : MonoBehaviour {
 
 		_step = "Pitch-volume sweep done";
 
+		_msr.applySpectrumMap = applySpectrumMapPrev;
 	}
 
 	void OnGUI() {

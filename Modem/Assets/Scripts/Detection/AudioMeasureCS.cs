@@ -24,10 +24,15 @@ public class AudioMeasureCS : MonoBehaviour
 
 	public float spectrumLerpFactor;
 
+	public bool applySpectrumMap = true;
+
 	[Range(8, 15)]
 	public int pow2samples = 12;
 	public AnimationCurve spectrumMap = AnimationCurve.Linear(0, 0, 1, 1);
-
+	public float lowPassFreq=400f;
+	public float highPassFreq=7000f;
+	
+	float _binQ;
 	AudioSource _asrc;
 
 	void OnGUI() {
@@ -46,6 +51,7 @@ public class AudioMeasureCS : MonoBehaviour
 		_spectrumLerped = new float[QSamples];
 
 		_freqSampleRate = AudioSettings.outputSampleRate;
+		_binQ = (_freqSampleRate/2f) / QSamples;
 		_asrc = GetComponent<AudioSource>();
 
 		Debug.Log("Output sample rate=" + _freqSampleRate);
@@ -116,6 +122,25 @@ public class AudioMeasureCS : MonoBehaviour
 		Debug.DrawLine(offset + maxP1 + Vector3.up * 100f, offset + maxP1 + Vector3.down * 100f, Color.green);
 		Debug.DrawLine(offset2 + maxP2 + Vector3.up * 100f, offset2 + maxP2 + Vector3.down * 100f, Color.magenta);
 
+		var data = Enumerable.Range(0, int.MaxValue)
+			.Zip(_spectrumLerped, _spectrumLerped.Skip(1), (i, v0, v1) => new {i=i, f=i*_binQ, v=v0, dv = v1-v0})
+			.ToArray();
+		var accumDelta;
+		for(int i = 0; i<data.Length; i++) {
+			data[i].i
+		}
+		//https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data
+		//TODO: Agarrar como para RRR vflips, es exactamente eso!
+
+		foreach(var peak in peaks) {
+			var pp =
+				new Vector3(
+					Mathf.Log(peak.i) * scale.x
+					, peak.v * scale.y
+					);
+			Debug.DrawLine(offset2 + maxP2 + Vector3.up * 100f, offset2 + maxP2 + Vector3.down * 100f, Color.magenta);
+		}
+
 	}
 
 	void AnalyzeSound()
@@ -135,13 +160,18 @@ public class AudioMeasureCS : MonoBehaviour
 
 		//Read the spectrum
 		_asrc.GetSpectrumData(_spectrum, 0, fftWindow);
-		//_asrc.GetSpectrumData(_spectrum, 0, FFTWindow.BlackmanHarris);
-		// _asrc.GetSpectrumData(_spectrum, 0, FFTWindow.Hamming);
 
+		int binLP = Mathf.FloorToInt(lowPassFreq / _binQ);
+		int binHP = Mathf.CeilToInt(highPassFreq / _binQ);
 		//Patch data from hearing curve and accumulate with interpolation.
 		var t = spectrumLerpFactor * Time.fixedDeltaTime;
 		for (int i = 0; i < _spectrum.Length; i++) {
-			_spectrum[i] = spectrumMap.Evaluate((float)i / QSamples * _freqSampleRate / 2) * _spectrum[i];
+			if(applySpectrumMap) {
+				if(i <= binLP || i >= binHP)
+					_spectrum[i] = 0f;
+				else
+					_spectrum[i] = spectrumMap.Evaluate((float)i / QSamples * _freqSampleRate / 2) * _spectrum[i];
+			}
 			_spectrumLerped[i] = Mathf.Lerp(_spectrumLerped[i], _spectrum[i], t);
 		}
 

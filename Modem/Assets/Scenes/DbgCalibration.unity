@@ -679,10 +679,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RmsValue: 0.031987946
   DbValue: -9.900272
-  PitchValue: 2625
+  PitchValueX: 0
   PitchValueY: -42.89247
   pitchIndex: 56
   QSamples: 512
+  fftWindow: 0
   spectrumLerpFactor: 3
   pow2samples: 9
   spectrumMap:

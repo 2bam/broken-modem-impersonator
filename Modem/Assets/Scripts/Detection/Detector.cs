@@ -72,6 +72,8 @@ public class Detector : MonoBehaviour {
 	public float specIncPerSec;
 	public float specDecPerSec;
 	public int dbAvgQAmt = 6;
+	
+
 
 	Dictionary<SoundChars, float> specificAmount = new Dictionary<SoundChars, float>()
 	{
